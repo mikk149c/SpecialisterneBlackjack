@@ -34,4 +34,4 @@ Reqirements:
     - GUI independent game logic
     - Ascii art cards for console based GUI
 Codeing language: C#
-Estimated time:5-8 dage af 8 timer
+Estimated time:5-8 days of 8 hours
