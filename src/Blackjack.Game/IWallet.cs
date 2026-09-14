@@ -8,6 +8,9 @@ namespace Blackjack.Game;
 public interface IWallet
 {
     int Balance { get; set; }
+    int Bet { get; }
+    bool BetPlaced { get; }
+
 
     /// <summary>
     /// Deducts <paramref name="amount"/> from <see cref="Balance"/>.

@@ -23,7 +23,12 @@ public sealed class GameFactory : IGameFactory
 
     public IDealerPlay CreateDealerPlay() => new DealerPlay();
 
-    public IBlackjackGame CreateGame(int startingBalance) => new Game(CreateDeck(), CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay());
+    public IBlackjackGame CreateGame(int startingBalance) => new Game(CreateDeck(), CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay(), CreateDealerHand(), CreatePlayerHand());
+
+    private IHand CreatePlayerHand() => new PlayerHand();
+
+    private IHand CreateDealerHand() => new DealerHand();
+
 
     public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay());
 }

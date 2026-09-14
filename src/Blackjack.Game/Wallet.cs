@@ -3,6 +3,8 @@ namespace Blackjack.Game
     public class Wallet : IWallet
     {
         public int Balance { get; set; }
+        public int Bet { get; set; }
+        public bool BetPlaced => Bet > 0;
 
         public Wallet(int balance)
         {
@@ -17,6 +19,7 @@ namespace Blackjack.Game
                 throw new InvalidOperationException("Insufficient balance to place the bet.");
 
             Balance -= amount;
+            bet = amount;
         }
 
         public int Settle(RoundOutcome outcome, int bet)

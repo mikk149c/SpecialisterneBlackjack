@@ -9,24 +9,29 @@ namespace Blackjack.Game
 
         public int Balance => _wallet.Balance;
 
-        public int CurrentBet => throw new NotImplementedException();
+        public int CurrentBet => _wallet.Bet;
 
         public bool IsRoundInProgress {get; set;}
 
-        public IHand PlayerHand => throw new NotImplementedException();
+        public IHand PlayerHand {get; private set;}
 
-        public IHand DealerHand => throw new NotImplementedException();
+        public IHand DealerHand {get; private set;}
 
-        public bool IsDealerHoleCardRevealed => throw new NotImplementedException();
+        public bool IsDealerHoleCardRevealed()
+        {
+            return !DealerHand.Cards.Any(card => card.IsFaceDown);
+        }
 
         public RoundOutcome? LastOutcome => throw new NotImplementedException();
 
-        public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IDealerPlay dealerPlay)
+        public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IDealerPlay dealerPlay, IHand dealerHand, IHand playerHand)
         {
             _deck = deck;
             _wallet = wallet;
             _roundResolver = roundResolver;
             _dealerPlay = dealerPlay;
+            DealerHand = dealerHand;
+            PlayerHand = playerHand;
             IsRoundInProgress = false;
         }
 
@@ -39,22 +44,45 @@ namespace Blackjack.Game
 
         public void PlaceBet(int amount)
         {
-            throw new NotImplementedException();
+            _wallet.PlaceBet(amount);
+            IsRoundInProgress = true;
+            dealInitialCards();
+        }
+
+        private void dealInitialCards()
+        {
+            drawCard(2, PlayerHand);
+            drawCard(2, DealerHand);
+        }
+
+        private void drawCard(int count, IHand hand)
+        {
+            for (int i = 0; i < count; i++)
+                hand.AddCard(_deck.DrawCard());
         }
 
         public void Hit()
         {
-            throw new NotImplementedException();
+            if (!_wallet.BetPlaced)
+            {
+                throw new InvalidOperationException("No bet has been placed. Please place a bet before hitting.");
+            }
         }
 
         public void Stand()
         {
-            throw new NotImplementedException();
+            if (!_wallet.BetPlaced)
+            {
+                throw new InvalidOperationException("No bet has been placed. Please place a bet before standing.");
+            }
         }
 
         public void DoubleDown()
         {
-            throw new NotImplementedException();
+            if (!_wallet.BetPlaced)
+            {
+                throw new InvalidOperationException("No bet has been placed. Please place a bet before doubling down.");
+            }
         }
 
     }
