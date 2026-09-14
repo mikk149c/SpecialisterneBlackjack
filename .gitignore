@@ -1,0 +1,20 @@
+# .NET build output
+bin/
+obj/
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# Rider / Visual Studio
+.vs/
+.idea/
+*.user
+*.userosscache
+*.suo
+
+# OS files
+.DS_Store
+Thumbs.db
