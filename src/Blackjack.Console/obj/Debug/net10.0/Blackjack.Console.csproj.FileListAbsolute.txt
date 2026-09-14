@@ -1,0 +1,14 @@
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\bin\Debug\net10.0\Blackjack.Console.exe
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\bin\Debug\net10.0\Blackjack.Console.deps.json
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\bin\Debug\net10.0\Blackjack.Console.runtimeconfig.json
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\bin\Debug\net10.0\Blackjack.Console.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\bin\Debug\net10.0\Blackjack.Console.pdb
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.AssemblyInfoInputs.cache
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.AssemblyInfo.cs
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.csproj.CoreCompileInputs.cache
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\refint\Blackjack.Console.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.pdb
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\Blackjack.Console.genruntimeconfig.cache
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Console\obj\Debug\net10.0\ref\Blackjack.Console.dll

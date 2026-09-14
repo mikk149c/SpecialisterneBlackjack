@@ -1,0 +1,11 @@
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\bin\Debug\net10.0\Blackjack.Game.deps.json
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\bin\Debug\net10.0\Blackjack.Game.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\bin\Debug\net10.0\Blackjack.Game.pdb
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.AssemblyInfoInputs.cache
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.AssemblyInfo.cs
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.csproj.CoreCompileInputs.cache
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\refint\Blackjack.Game.dll
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\Blackjack.Game.pdb
+C:\Users\mikke\Dropbox\Projects\Specilaisterne\Blackjack\src\Blackjack.Game\obj\Debug\net10.0\ref\Blackjack.Game.dll
