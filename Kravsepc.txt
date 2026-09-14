@@ -1,9 +1,9 @@
-Navn: Mikkel Jøregensen
-Opgave: Blackjack
-Krav:
-    Funktionelle krav:
-    - 
-    Ikke.Funktionelle krav:
+Name: Mikkel Jøregensen
+Project: Blackjack
+Reqirement:
+    Functionel reqirement:
     -
-Kodesprog: C#
-Estimeret tid:5-8 dage af 8 timer.
+    Non functionel reqirement:
+    -
+Codeing language: C#
+Estimated time:5-8 dage af 8 timer
