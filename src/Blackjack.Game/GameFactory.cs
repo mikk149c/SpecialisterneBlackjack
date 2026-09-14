@@ -1,0 +1,29 @@
+namespace Blackjack.Game;
+
+/// <summary>
+/// Default <see cref="IGameFactory"/>. Every method is a stub that throws
+/// <see cref="NotImplementedException"/> until it is implemented to
+/// construct and return a real <see cref="IDeck"/>, <see cref="IHand"/>,
+/// <see cref="IWallet"/>, <see cref="IRoundResolver"/>, <see cref="IDealerPlay"/>
+/// or <see cref="IBlackjackGame"/>.
+/// </summary>
+public sealed class GameFactory : IGameFactory
+{
+    public const int DefaultStartingBalance = 1000;
+
+    public IDeck CreateDeck() => new Deck();
+
+    public IDeck CreateDeck(IEnumerable<Card> cards) => throw new NotImplementedException();
+
+    public IHand CreateHand() => throw new NotImplementedException();
+
+    public IWallet CreateWallet(int startingBalance) => new Wallet(startingBalance);
+
+    public IRoundResolver CreateRoundResolver() => new RoundResolver();
+
+    public IDealerPlay CreateDealerPlay() => new DealerPlay();
+
+    public IBlackjackGame CreateGame(int startingBalance) => new Game(CreateDeck(), CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay());
+
+    public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay());
+}
