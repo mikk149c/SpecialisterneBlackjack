@@ -1,6 +1,6 @@
 namespace Blackjack.Game;
 
-internal class Card
+public class Card
 {
     public int Index {get; private set;}
     public bool IsFaceUp {get; set;}
@@ -10,7 +10,18 @@ internal class Card
         IsFaceUp = false;
     }
 
+    public Card(Rank rank, Suit suit)
+    {
+        setIndex(rank, suit);
+    }
+
+    private void setIndex(Rank rank, Suit suit)
+    {
+        Index = ((int)rank - 2) + ((int)suit * 13);
+    }
+
+
     public Suit Suit => (Suit)(Index / 13);
-    public int Value => Index % 13;
-    public Rank Rank => (Rank)(Value + 2);
+    public int Value => (Index % 13) + 2;
+    public Rank Rank => (Rank)(Value);
 }

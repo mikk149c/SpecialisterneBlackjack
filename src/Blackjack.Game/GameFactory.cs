@@ -15,7 +15,7 @@ public sealed class GameFactory : IGameFactory
 
     public IDeck CreateDeck(IEnumerable<Card> cards) => throw new NotImplementedException();
 
-    public IHand CreateHand() => throw new NotImplementedException();
+    public IHand CreateHand() => new PlayerHand();
 
     public IWallet CreateWallet(int startingBalance) => new Wallet(startingBalance);
 
@@ -23,12 +23,12 @@ public sealed class GameFactory : IGameFactory
 
     public IDealerPlay CreateDealerPlay() => new DealerPlay();
 
-    public IBlackjackGame CreateGame(int startingBalance) => new Game(CreateDeck(), CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay(), CreateDealerHand(), CreatePlayerHand());
+    public IBlackjackGame CreateGame(int startingBalance) => CreateGame(startingBalance, CreateDeck());
 
     private IHand CreatePlayerHand() => new PlayerHand();
 
     private IHand CreateDealerHand() => new DealerHand();
 
 
-    public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay());
+    public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay(), CreateDealerHand(), CreatePlayerHand());
 }

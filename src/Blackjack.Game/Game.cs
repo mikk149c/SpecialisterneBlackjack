@@ -17,12 +17,10 @@ namespace Blackjack.Game
 
         public IHand DealerHand {get; private set;}
 
-        public bool IsDealerHoleCardRevealed()
-        {
-            return !DealerHand.Cards.Any(card => card.IsFaceDown);
-        }
+        public bool IsDealerHoleCardRevealed => DealerHand.Cards.All(card => card.IsFaceUp);
 
         public RoundOutcome? LastOutcome => throw new NotImplementedException();
+
 
         public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IDealerPlay dealerPlay, IHand dealerHand, IHand playerHand)
         {

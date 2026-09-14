@@ -14,7 +14,9 @@ internal class Deck : IDeck
 
     public Card DrawCard()
     {
-        throw new NotImplementedException();
+        Card card = _cards[0];
+        _cards.RemoveAt(0);
+        return card;
     }
 
     public void Shuffle()
