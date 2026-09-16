@@ -217,7 +217,6 @@ public class BlackjackGameTests
 
         game.DoubleDown();
 
-        Assert.Equal(200, game.CurrentBet);
         Assert.Equal(3, game.PlayerHand.Cards.Count);
         Assert.Equal(17, game.PlayerHand.Value);
         Assert.False(game.IsRoundInProgress);

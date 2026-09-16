@@ -11,7 +11,7 @@ public abstract class Hand : IHand
 
     public IReadOnlyList<Card> Cards => _cards;
 
-    public void AddCard(Card card)
+    public virtual void AddCard(Card card)
     {
         _cards.Add(card);
     }
@@ -53,4 +53,9 @@ public abstract class Hand : IHand
     public bool IsBust => Value > 21;
 
     public bool IsBlackjack => Cards.Count == 2 && Value == 21;
+
+    public virtual void RevealHoleCard()
+    {
+        throw new InvalidOperationException("RevealHoleCard should only be called on a DealerHand, not a PlayerHand.");
+    }
 }

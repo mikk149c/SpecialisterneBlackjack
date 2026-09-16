@@ -81,6 +81,29 @@ public class DeckTests
     }
 
     [Fact]
+    public void Shuffle_ReordersTheCards()
+    {
+        var originalOrder = new List<int>();
+        var reference = _factory.CreateDeck();
+        while (reference.CardsRemaining > 0)
+        {
+            originalOrder.Add(reference.DrawCard().Index);
+        }
+
+        var deck = _factory.CreateDeck();
+        deck.Shuffle();
+
+        var shuffledOrder = new List<int>();
+        while (deck.CardsRemaining > 0)
+        {
+            shuffledOrder.Add(deck.DrawCard().Index);
+        }
+
+        // A true shuffle landing back in the original order is a 1-in-52! chance.
+        Assert.NotEqual(originalOrder, shuffledOrder);
+    }
+
+    [Fact]
     public void Shuffle_DoesNotChangeCardsRemaining()
     {
         var deck = _factory.CreateDeck();

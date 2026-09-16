@@ -21,4 +21,6 @@ public interface IHand
 
     /// <summary>True when this hand is exactly two cards totalling 21.</summary>
     bool IsBlackjack { get; }
+
+    public void RevealHoleCard();
 }

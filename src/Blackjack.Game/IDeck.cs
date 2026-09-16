@@ -16,4 +16,6 @@ public interface IDeck
     /// when the deck is empty.
     /// </summary>
     Card DrawCard();
+
+    public bool HasCards();
 }

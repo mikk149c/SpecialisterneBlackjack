@@ -19,21 +19,22 @@ namespace Blackjack.Game
                 throw new InvalidOperationException("Insufficient balance to place the bet.");
 
             Balance -= amount;
-            Bet = amount;
+            Bet += amount;
         }
 
-        public int Settle(RoundOutcome outcome, int bet)
+        public int Settle(RoundOutcome outcome)
         {
             int payout = outcome switch
             {
-                RoundOutcome.PlayerWin => bet,
-                RoundOutcome.Blackjack => (int)(bet * 1.5),
-                RoundOutcome.Push => 0,
-                RoundOutcome.DealerWin => -bet,
+                RoundOutcome.PlayerWin => Bet*2,
+                RoundOutcome.Blackjack => (int)(Bet * 2.5),
+                RoundOutcome.Push => Bet,
+                RoundOutcome.DealerWin => 0,
                 _ => throw new ArgumentOutOfRangeException(nameof(outcome), "Invalid round outcome.")
             };
 
             Balance += payout;
+            Bet = 0;
             return payout;
         }
 

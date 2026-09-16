@@ -13,7 +13,7 @@ public sealed class GameFactory : IGameFactory
 
     public IDeck CreateDeck() => new Deck();
 
-    public IDeck CreateDeck(IEnumerable<Card> cards) => throw new NotImplementedException();
+    public IDeck CreateDeck(IEnumerable<Card> cards) => new Deck(cards);
 
     public IHand CreateHand() => new PlayerHand();
 

@@ -24,5 +24,5 @@ public interface IWallet
     /// <paramref name="bet"/> back to <see cref="Balance"/>, and returns the
     /// amount credited.
     /// </summary>
-    int Settle(RoundOutcome outcome, int bet);
+    int Settle(RoundOutcome outcome);
 }

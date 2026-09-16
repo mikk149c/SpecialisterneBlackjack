@@ -61,7 +61,7 @@ public class WalletTests
         var wallet = _factory.CreateWallet(1000);
         wallet.PlaceBet(200);
 
-        var payout = wallet.Settle(RoundOutcome.PlayerWin, 200);
+        var payout = wallet.Settle(RoundOutcome.PlayerWin);
 
         Assert.Equal(400, payout);
         Assert.Equal(1200, wallet.Balance);
@@ -73,7 +73,7 @@ public class WalletTests
         var wallet = _factory.CreateWallet(1000);
         wallet.PlaceBet(200);
 
-        var payout = wallet.Settle(RoundOutcome.Blackjack, 200);
+        var payout = wallet.Settle(RoundOutcome.Blackjack);
 
         Assert.Equal(500, payout); // 200 stake back + 300 winnings
         Assert.Equal(1300, wallet.Balance);
@@ -85,7 +85,7 @@ public class WalletTests
         var wallet = _factory.CreateWallet(1000);
         wallet.PlaceBet(200);
 
-        var payout = wallet.Settle(RoundOutcome.Push, 200);
+        var payout = wallet.Settle(RoundOutcome.Push);
 
         Assert.Equal(200, payout);
         Assert.Equal(1000, wallet.Balance);
@@ -97,7 +97,7 @@ public class WalletTests
         var wallet = _factory.CreateWallet(1000);
         wallet.PlaceBet(200);
 
-        var payout = wallet.Settle(RoundOutcome.DealerWin, 200);
+        var payout = wallet.Settle(RoundOutcome.DealerWin);
 
         Assert.Equal(0, payout);
         Assert.Equal(800, wallet.Balance);
