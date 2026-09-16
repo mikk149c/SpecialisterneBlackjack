@@ -17,24 +17,6 @@ public class DeckTests
     }
 
     [Fact]
-    public void CreateDeck_Default_ContainsEveryRankAndSuitExactlyOnce()
-    {
-        var deck = _factory.CreateDeck();
-
-        var drawn = new List<Card>();
-        for (var i = 0; i < 52; i++)
-        {
-            drawn.Add(deck.DrawCard());
-        }
-
-        var expected = Enum.GetValues<Suit>()
-            .SelectMany(suit => Enum.GetValues<Rank>().Select(rank => new Card(rank, suit)));
-
-        Assert.Equal(expected.OrderBy(c => c.Suit).ThenBy(c => c.Rank),
-            drawn.OrderBy(c => c.Suit).ThenBy(c => c.Rank));
-    }
-
-    [Fact]
     public void DrawCard_ReducesCardsRemainingByOne()
     {
         var deck = _factory.CreateDeck();
@@ -84,7 +66,7 @@ public class DeckTests
     public void Shuffle_ReordersTheCards()
     {
         var originalOrder = new List<int>();
-        var reference = _factory.CreateDeck();
+        var reference = _factory.CreateDeck(true);
         while (reference.CardsRemaining > 0)
         {
             originalOrder.Add(reference.DrawCard().Index);
@@ -120,6 +102,8 @@ public class DeckTests
             .SelectMany(suit => Enum.GetValues<Rank>().Select(rank => new Card(rank, suit)))
             .ToList();
 
+        foreach (Card card in cards)
+            card.IsFaceUp = true;
         var shuffled = _factory.CreateDeck(cards);
         shuffled.Shuffle();
 

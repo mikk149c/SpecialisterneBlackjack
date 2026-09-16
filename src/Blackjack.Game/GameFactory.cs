@@ -11,7 +11,7 @@ public sealed class GameFactory : IGameFactory
 {
     public const int DefaultStartingBalance = 1000;
 
-    public IDeck CreateDeck() => new Deck();
+    public IDeck CreateDeck(bool reveal = false) => new Deck(reveal);
 
     public IDeck CreateDeck(IEnumerable<Card> cards) => new Deck(cards);
 

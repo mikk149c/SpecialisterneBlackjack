@@ -91,11 +91,11 @@ namespace Blackjack.Game
 
         private void endRound()
         {
+            DealerHand.RevealHoleCard();
             while (!DealerHand.IsBust && DealerHand.Value < 17 && _deck.HasCards())
             {
                 drawCard(1, DealerHand);
             }
-            DealerHand.RevealHoleCard();
             IsRoundInProgress = false;
             LastOutcome = _roundResolver.Resolve(PlayerHand, DealerHand);
             _wallet.Settle(LastOutcome.Value);

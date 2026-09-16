@@ -9,7 +9,7 @@ namespace Blackjack.Game;
 public interface IGameFactory
 {
     /// <summary>A standard, unshuffled 52-card deck (every Rank x Suit combination once).</summary>
-    IDeck CreateDeck();
+    IDeck CreateDeck(bool reveal = false);
 
     /// <summary>
     /// A deck containing exactly the given cards, in the given order.

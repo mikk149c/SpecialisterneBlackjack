@@ -56,6 +56,6 @@ public abstract class Hand : IHand
 
     public virtual void RevealHoleCard()
     {
-        throw new InvalidOperationException("RevealHoleCard should only be called on a DealerHand, not a PlayerHand.");
+        throw new InvalidOperationException("RevealHoleCard should only be called on a DealerHand.");
     }
 }

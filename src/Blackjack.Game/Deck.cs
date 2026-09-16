@@ -4,11 +4,13 @@ internal class Deck : IDeck
 {
     private List<Card> _cards = new List<Card>();
     public int CardsRemaining => _cards.Count;
-    public Deck()
+    public Deck(bool reveal = false)
     {
         for (int i = 0; i < 52; i++)
         {
-            _cards.Add(new Card(i));
+            Card card = new Card(i);
+            card.IsFaceUp = reveal;
+            _cards.Add(card);
         }
     }
 
