@@ -29,12 +29,12 @@ internal sealed class ScreenRenderer
         _gallery = gallery;
     }
 
-    public void Render(IBlackjackGame game, IDeck deck, string status)
+    public void Render(IBlackjackGame game, string status)
     {
         try { System.Console.Clear(); }
         catch (IOException) { }
 
-        WriteHeader(game, deck);
+        WriteHeader(game);
         System.Console.WriteLine();
         WriteHandSection("PLAYER", game.PlayerHand.Cards, PlayerValueLabel(game));
         System.Console.WriteLine();
@@ -47,10 +47,10 @@ internal sealed class ScreenRenderer
     // count, so this needs its own reference to the same IDeck passed into
     // GameFactory.CreateGame(startingBalance, deck) just to show it here. Ideally
     // IBlackjackGame would expose CardsRemaining directly.
-    private static void WriteHeader(IBlackjackGame game, IDeck deck)
+    private static void WriteHeader(IBlackjackGame game)
     {
         string lastRound = game.LastOutcome?.ToString() ?? "-";
-        WriteLinePadded($" Balance: {game.Balance,-8} Bet: {game.CurrentBet,-6} Last Round: {lastRound,-12} Cards Left: {deck.CardsRemaining}");
+        WriteLinePadded($" Balance: {game.Balance,-8} Bet: {game.CurrentBet,-6} Last Round: {lastRound,-12} Cards Left: {game.GetCardsRemaining()}");
         System.Console.WriteLine(new string('=', Width));
     }
 
@@ -91,13 +91,6 @@ internal sealed class ScreenRenderer
         System.Console.WriteLine(new string('-', Width));
     }
 
-    // TODO(Blackjack.Game): PlayerHand never sets Card.IsFaceUp = true when a card is
-    // added (DealerHand does this for its own cards, PlayerHand has no such override).
-    // Card.Rank/Suit/Value/Index all gate on IsFaceUp and return Blank/-1 while a card
-    // is face-down, so every card in the player's hand renders as a card back here and
-    // PlayerHand.Value below is wrong (it sums Rank.Blank = 15 per card) until that's
-    // fixed in the library - nothing in this console project can set IsFaceUp itself,
-    // since PlayerHand.AddCard is only ever called internally by Game.
     private static string PlayerValueLabel(IBlackjackGame game) =>
         game.PlayerHand.Cards.Count == 0 ? "-" : game.PlayerHand.Value.ToString();
 

@@ -11,14 +11,8 @@ var renderer = new ScreenRenderer(gallery);
 
 var factory = new GameFactory();
 
-// TODO(Blackjack.Game): GameFactory.CreateDeck()/CreateGame(startingBalance) never
-// shuffle - README says "the deck shall be shuffled before a new game starts", but
-// nothing in the library calls IDeck.Shuffle(). Working around it here by building
-// the deck ourselves and shuffling it before handing it to the game, using only
-// public API (no library changes).
-var deck = factory.CreateDeck();
-deck.Shuffle();
-IBlackjackGame game = factory.CreateGame(GameFactory.DefaultStartingBalance, deck);
+
+IBlackjackGame game = factory.CreateGame(GameFactory.DefaultStartingBalance);
 
 var status = "Place your bet to start the first round.";
 var running = true;
@@ -27,7 +21,7 @@ while (running)
 {
     // `deck` is kept as a side reference purely so the header can show cards
     // remaining - see the TODO in ScreenRenderer.WriteHeader.
-    renderer.Render(game, deck, status);
+    renderer.Render(game, status);
     var key = System.Console.ReadKey(intercept: true).Key;
     status = HandleKey(key, game, status, ref running);
 }

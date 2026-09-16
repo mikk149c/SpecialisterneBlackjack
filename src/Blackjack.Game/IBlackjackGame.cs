@@ -56,4 +56,5 @@ public interface IBlackjackGame
     /// <see cref="InvalidOperationException"/>.
     /// </summary>
     void DoubleDown();
+    int GetCardsRemaining();
 }
