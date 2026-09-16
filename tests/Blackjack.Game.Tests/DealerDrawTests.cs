@@ -1,15 +1,13 @@
 namespace Blackjack.Game.Tests;
 
 /// <summary>
-/// Covers the dealer's fixed strategy: draw until the hand is worth at least 17.
-///
-/// This logic lives inline in <c>Game.endRound</c> rather than in
-/// <c>DealerPlay</c> (which is an unused stub), so these scenarios are
-/// exercised through <see cref="IBlackjackGame.Stand"/>, which triggers
+/// Covers the dealer's fixed strategy: draw until the hand is worth at least
+/// 17. This logic lives inline in <c>Game.endRound</c>, so these scenarios
+/// are exercised through <see cref="IBlackjackGame.Stand"/>, which triggers
 /// <c>endRound</c>. Player cards are an arbitrary low, non-blackjack hand in
 /// every case since only the dealer's draw behavior is under test.
 /// </summary>
-public class DealerPlayTests
+public class DealerDrawTests
 {
     private readonly IGameFactory _factory = new GameFactory();
 

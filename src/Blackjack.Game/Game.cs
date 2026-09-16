@@ -5,7 +5,6 @@ namespace Blackjack.Game
         private readonly IDeck _deck;
         private readonly IWallet _wallet;
         private readonly IRoundResolver _roundResolver;
-        private readonly IDealerPlay _dealerPlay;
 
         public int Balance => _wallet.Balance;
 
@@ -22,12 +21,11 @@ namespace Blackjack.Game
         public RoundOutcome? LastOutcome {get; private set;}
 
 
-        public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IDealerPlay dealerPlay, IHand dealerHand, IHand playerHand)
+        public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IHand dealerHand, IHand playerHand)
         {
             _deck = deck;
             _wallet = wallet;
             _roundResolver = roundResolver;
-            _dealerPlay = dealerPlay;
             DealerHand = dealerHand;
             PlayerHand = playerHand;
             IsRoundInProgress = false;

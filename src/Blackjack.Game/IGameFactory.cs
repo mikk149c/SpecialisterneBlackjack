@@ -3,7 +3,7 @@ namespace Blackjack.Game;
 /// <summary>
 /// Creates the game engine's building blocks. This is the only seam through
 /// which concrete implementations of <see cref="IDeck"/>, <see cref="IHand"/>,
-/// <see cref="IWallet"/>, <see cref="IRoundResolver"/>, <see cref="IDealerPlay"/>
+/// <see cref="IWallet"/>, <see cref="IRoundResolver"/>
 /// and <see cref="IBlackjackGame"/> come into existence.
 /// </summary>
 public interface IGameFactory
@@ -23,8 +23,6 @@ public interface IGameFactory
     IWallet CreateWallet(int startingBalance);
 
     IRoundResolver CreateRoundResolver();
-
-    IDealerPlay CreateDealerPlay();
 
     /// <summary>A new session that deals from its own internal deck, freshly shuffled before every round.</summary>
     IBlackjackGame CreateGame(int startingBalance);

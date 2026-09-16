@@ -4,7 +4,7 @@ namespace Blackjack.Game;
 /// Default <see cref="IGameFactory"/>. Every method is a stub that throws
 /// <see cref="NotImplementedException"/> until it is implemented to
 /// construct and return a real <see cref="IDeck"/>, <see cref="IHand"/>,
-/// <see cref="IWallet"/>, <see cref="IRoundResolver"/>, <see cref="IDealerPlay"/>
+/// <see cref="IWallet"/>, <see cref="IRoundResolver"/>
 /// or <see cref="IBlackjackGame"/>.
 /// </summary>
 public sealed class GameFactory : IGameFactory
@@ -21,8 +21,6 @@ public sealed class GameFactory : IGameFactory
 
     public IRoundResolver CreateRoundResolver() => new RoundResolver();
 
-    public IDealerPlay CreateDealerPlay() => new DealerPlay();
-
     public IBlackjackGame CreateGame(int startingBalance) => CreateGame(startingBalance, CreateDeck());
 
     private IHand CreatePlayerHand() => new PlayerHand();
@@ -30,5 +28,5 @@ public sealed class GameFactory : IGameFactory
     private IHand CreateDealerHand() => new DealerHand();
 
 
-    public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerPlay(), CreateDealerHand(), CreatePlayerHand());
+    public IBlackjackGame CreateGame(int startingBalance, IDeck deck) => new Game(deck, CreateWallet(startingBalance), CreateRoundResolver(), CreateDealerHand(), CreatePlayerHand());
 }
