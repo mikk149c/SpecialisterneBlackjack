@@ -13,6 +13,7 @@ var factory = new GameFactory();
 
 
 IBlackjackGame game = factory.CreateGame(GameFactory.DefaultStartingBalance);
+game.ShuffleDeck();
 
 var status = "Place your bet to start the first round.";
 var running = true;
@@ -24,6 +25,11 @@ while (running)
     renderer.Render(game, status);
     var key = System.Console.ReadKey(intercept: true).Key;
     status = HandleKey(key, game, status, ref running);
+    if(game.GetCardsRemaining() < 15)
+    {
+        game.NewDeck();
+        game.ShuffleDeck();
+    }
 }
 
 TrySetCursorVisible(true);

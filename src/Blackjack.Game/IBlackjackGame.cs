@@ -57,4 +57,6 @@ public interface IBlackjackGame
     /// </summary>
     void DoubleDown();
     int GetCardsRemaining();
+    public void NewDeck();
+    public void ShuffleDeck();
 }

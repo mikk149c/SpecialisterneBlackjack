@@ -24,12 +24,21 @@ namespace Blackjack.Game
         public Game(IDeck deck, IWallet wallet, IRoundResolver roundResolver, IHand dealerHand, IHand playerHand)
         {
             _deck = deck;
-            _deck.Shuffle();
             _wallet = wallet;
             _roundResolver = roundResolver;
             DealerHand = dealerHand;
             PlayerHand = playerHand;
             IsRoundInProgress = false;
+        }
+
+        public void ShuffleDeck()
+        {
+            _deck.Shuffle();
+        }
+
+        public void NewDeck()
+        {
+            _deck.RefreshDeck();
         }
 
         public void PlayRound()

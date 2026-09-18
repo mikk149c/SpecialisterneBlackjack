@@ -18,4 +18,6 @@ public interface IDeck
     Card DrawCard();
 
     public bool HasCards();
+
+    public void RefreshDeck();
 }
