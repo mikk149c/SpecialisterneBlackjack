@@ -211,3 +211,5 @@ Still in progress:
 - `Deck.Shuffle()` is not implemented yet.
 - `Blackjack.Console` is a placeholder and doesn't yet drive the engine or
   render ASCII cards.
+
+Noget helt andet
