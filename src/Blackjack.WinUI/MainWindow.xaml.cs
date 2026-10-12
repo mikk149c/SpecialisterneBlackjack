@@ -33,6 +33,15 @@ public sealed partial class MainWindow : Window
     /// <summary>Card-back art for the deck stack.</summary>
     public IReadOnlyList<string> CardBackLines { get; }
 
+    // Stand-in until the bet dialog exists (issue #11, which replaces this handler): say so in the
+    // status line instead of silently ignoring the key.
+    private void OnPlaceBetRequested(object? sender, EventArgs e) =>
+        Actions.Notice = "Bet entry is not available yet.";
+
+    // Window.Close, not Application.Exit: it runs the window's Closed handlers (so the lifecycle
+    // work in issue #12 can hook there) and ends the app because this is its only window.
+    private void OnQuitRequested(object? sender, EventArgs e) => Close();
+
     // AppWindow works in physical pixels, so scale the DIP sizes by the monitor's factor.
     private void ApplyWindowSizes()
     {
