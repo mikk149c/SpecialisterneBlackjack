@@ -1,5 +1,6 @@
 using Blackjack.Presentation;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Blackjack.WinUI.Controls;
@@ -42,7 +43,11 @@ public sealed partial class DeckStack : UserControl
         set => SetValue(JustRefilledProperty, value);
     }
 
-    /// <summary>The card-back art (<see cref="CardArtGallery.CardHeight"/> lines), supplied by the caller.</summary>
+    /// <summary>
+    /// The card-back art, supplied by the caller: <see cref="CardArtGallery.CardHeight"/> lines of at
+    /// least <see cref="CardArtGallery.CardWidth"/> characters, otherwise an <see cref="ArgumentException"/>
+    /// is thrown. <c>null</c> draws an empty stack.
+    /// </summary>
     public IReadOnlyList<string>? CardBackLines
     {
         get => (IReadOnlyList<string>?)GetValue(CardBackLinesProperty);
@@ -61,6 +66,7 @@ public sealed partial class DeckStack : UserControl
             ? string.Empty
             : string.Join('\n', DeckStackLayout.Build(cardBack, DeckStackLayout.LabelFor(CardsRemaining, JustRefilled)));
 
+        AutomationProperties.SetName(this, DeckStackLayout.AccessibleName(CardsRemaining, JustRefilled));
         VisualStateManager.GoToState(this, JustRefilled ? "Refilled" : "Normal", useTransitions: false);
     }
 }

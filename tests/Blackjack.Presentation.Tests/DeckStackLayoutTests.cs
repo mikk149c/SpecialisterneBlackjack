@@ -18,6 +18,49 @@ public class DeckStackLayoutTests
     }
 
     [Fact]
+    public void TotalHeight_IsCaptionPlusStack()
+    {
+        var lines = DeckStackLayout.Build(CardBack, "42");
+
+        Assert.Equal(CardArtGallery.CardHeight + 3, DeckStackLayout.TotalHeight);
+        Assert.Equal(DeckStackLayout.TotalHeight, 1 + lines.Count);
+        Assert.Equal(DeckStackLayout.Width, DeckStackLayout.TitleLine.Length);
+    }
+
+    [Theory]
+    [InlineData(38, false, "Deck, 38 cards remaining")]
+    [InlineData(1, false, "Deck, 1 card remaining")]
+    [InlineData(0, false, "Deck, 0 cards remaining")]
+    [InlineData(14, true, "Deck refilled")]
+    public void AccessibleName_DescribesThePile(int cardsRemaining, bool justRefilled, string expected)
+    {
+        Assert.Equal(expected, DeckStackLayout.AccessibleName(cardsRemaining, justRefilled));
+    }
+
+    [Fact]
+    public void Build_NullCardBack_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => DeckStackLayout.Build(null!, "1"));
+    }
+
+    [Fact]
+    public void Build_TooFewLines_ThrowsArgumentException()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => DeckStackLayout.Build(CardBack.Take(3).ToArray(), "1"));
+
+        Assert.Contains("7 lines", ex.Message);
+    }
+
+    [Fact]
+    public void Build_TooShortLine_ThrowsArgumentException()
+    {
+        var shortLine = CardBack.ToArray();
+        shortLine[4] = "abc";
+
+        Assert.Throws<ArgumentException>(() => DeckStackLayout.Build(shortLine, "1"));
+    }
+
+    [Fact]
     public void Build_ReturnsFixedFootprint()
     {
         var lines = DeckStackLayout.Build(CardBack, "42");
