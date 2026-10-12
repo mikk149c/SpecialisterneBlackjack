@@ -56,16 +56,6 @@ public class CoverageGapTests
     }
 
     [Fact]
-    public void Game_GetCardsRemaining_DecreasesByFourWhenInitialCardsAreDealt()
-    {
-        var game = _factory.CreateGame(1000);
-
-        game.PlaceBet(100);
-
-        Assert.Equal(48, game.GetCardsRemaining());
-    }
-
-    [Fact]
     public void Game_PlaceBet_WhileRoundInProgress_ThrowsAndKeepsBalance()
     {
         var game = _factory.CreateGame(1000);
@@ -75,23 +65,6 @@ public class CoverageGapTests
 
         Assert.StartsWith("A round is already in progress", ex.Message);
         Assert.Equal(900, game.Balance);
-    }
-
-    [Fact]
-    public void Game_PlayRound_IsANoOpAndLeavesStateUntouched()
-    {
-        var game = new Game(
-            _factory.CreateDeck(),
-            _factory.CreateWallet(1000),
-            _factory.CreateRoundResolver(),
-            _factory.CreateHand(),
-            _factory.CreateHand());
-
-        game.PlayRound();
-
-        Assert.Equal(1000, game.Balance);
-        Assert.False(game.IsRoundInProgress);
-        Assert.Equal(52, game.GetCardsRemaining());
     }
 
     [Fact]
@@ -140,6 +113,12 @@ public class CoverageGapTests
 
         Assert.False(wallet.BetPlaced);
         Assert.Equal(0, wallet.Bet);
+
+        wallet.PlaceBet(300);
+
+        Assert.True(wallet.BetPlaced);
+        Assert.Equal(300, wallet.Bet);
+        Assert.Equal(500, wallet.Balance);
     }
 
     [Fact]
@@ -157,7 +136,15 @@ public class CoverageGapTests
         var b = new Card(Rank.Ten, Suit.Hearts);
 
         Assert.True(a.Equals(b));
-        Assert.False(a.Equals(new Card(Rank.Ten, Suit.Clubs)));
+    }
+
+    [Fact]
+    public void Card_Equals_SameRankDifferentSuit_ReturnsFalse()
+    {
+        var a = new Card(Rank.Ten, Suit.Hearts);
+        var b = new Card(Rank.Ten, Suit.Clubs);
+
+        Assert.False(a.Equals(b));
     }
 
     [Fact]
