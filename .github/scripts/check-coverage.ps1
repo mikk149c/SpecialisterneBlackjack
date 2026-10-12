@@ -22,7 +22,11 @@ foreach ($report in $reports) {
         if ($Packages -notcontains $package.name) { continue }
         foreach ($class in $package.classes.class) {
             foreach ($line in $class.lines.line) {
-                $key = "$($package.name)|$($class.filename)|$($line.number)"
+                # Different test projects report the same source file with different
+                # prefixes ("Game.cs" vs "Blackjack.Game\Game.cs"); normalise so each
+                # line is counted once.
+                $file = ($class.filename -replace '/', '\') -replace "^$([regex]::Escape($package.name))\\", ''
+                $key = "$($package.name)|$file|$($line.number)"
                 $count = [int]$line.hits
                 if (-not $hits.ContainsKey($key) -or $hits[$key] -lt $count) { $hits[$key] = $count }
             }
