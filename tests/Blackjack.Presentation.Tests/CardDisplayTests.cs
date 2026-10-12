@@ -73,6 +73,48 @@ public class CardDisplayTests
     }
 
     [Fact]
+    public void Description_FaceUpCard_NamesRankAndSuit()
+    {
+        var display = CardDisplay.Create(_gallery, FaceUp(Rank.Queen, Suit.Hearts));
+
+        Assert.Equal("Queen of Hearts", display.Description);
+    }
+
+    [Fact]
+    public void Description_FaceDownCard_DoesNotRevealTheCard()
+    {
+        var card = new Card(Rank.Queen, Suit.Hearts) { IsFaceUp = false };
+
+        var display = CardDisplay.Create(_gallery, card);
+
+        Assert.Equal(CardDisplay.FaceDownDescription, display.Description);
+    }
+
+    [Fact]
+    public void Description_ForceBackFaceUpCard_DoesNotRevealTheCard()
+    {
+        var display = CardDisplay.Create(_gallery, FaceUp(Rank.Ace, Suit.Spades), forceBack: true);
+
+        Assert.Equal(CardDisplay.FaceDownDescription, display.Description);
+    }
+
+    [Fact]
+    public void Description_NoCard_IsEmptySlot()
+    {
+        var display = CardDisplay.Create(_gallery, null);
+
+        Assert.Equal(CardDisplay.EmptySlotDescription, display.Description);
+    }
+
+    [Fact]
+    public void Empty_HasNoLinesAndIsNeutral()
+    {
+        Assert.Empty(CardDisplay.Empty.Lines);
+        Assert.Equal(CardInk.Neutral, CardDisplay.Empty.Ink);
+        Assert.Equal(CardDisplay.EmptySlotDescription, CardDisplay.Empty.Description);
+    }
+
+    [Fact]
     public void Create_ReflectsFlippedCardWhenCalledAgain()
     {
         var card = new Card(Rank.Five, Suit.Diamonds) { IsFaceUp = false };

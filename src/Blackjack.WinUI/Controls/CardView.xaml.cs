@@ -1,6 +1,7 @@
 using Blackjack.Game;
 using Blackjack.Presentation;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 
@@ -9,8 +10,9 @@ namespace Blackjack.WinUI.Controls;
 /// <summary>
 /// Draws one card as the 11x7 ASCII art the console app uses. It only displays
 /// the card it is given. <see cref="Card.IsFaceUp"/> is mutable and cannot be
-/// observed, so the owner calls <see cref="Refresh"/> (or reassigns
-/// <see cref="Card"/>) after the engine changes a card.
+/// observed (assigning the same <see cref="Card"/> instance again raises no
+/// change), so the owner calls <see cref="Refresh"/> after the engine flips or
+/// otherwise changes a card.
 /// </summary>
 public sealed partial class CardView : UserControl
 {
@@ -23,8 +25,8 @@ public sealed partial class CardView : UserControl
     public CardView()
     {
         InitializeComponent();
-        // Nothing is drawn until a card is set, so an empty slot does not need the art file.
         ActualThemeChanged += (_, _) => Refresh();
+        Refresh();
     }
 
     public Card? Card
@@ -40,15 +42,23 @@ public sealed partial class CardView : UserControl
         set => SetValue(ForceBackProperty, value);
     }
 
+    /// <summary>Re-renders the control from the current state of <see cref="Card"/>.</summary>
     public void Refresh()
     {
-        var display = CardDisplay.Create(CardArtService.Gallery, Card, ForceBack);
+        var display = ResolveDisplay();
         ArtText.Text = string.Join('\n', display.Lines);
+        AutomationProperties.SetName(this, display.Description);
         ApplyInk(display.Ink);
     }
 
     private static void OnDisplayInputChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) =>
         ((CardView)sender).Refresh();
+
+    // An empty slot is drawn without the art file, so it never fails when the file is missing.
+    private CardDisplay ResolveDisplay() =>
+        Card is null && !ForceBack
+            ? CardDisplay.Empty
+            : CardDisplay.Create(CardArtService.Gallery, Card, ForceBack);
 
     private void ApplyInk(CardInk ink)
     {

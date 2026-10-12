@@ -5,6 +5,7 @@
     Width="96"
     Height="112"
     IsTabStop="False">
+    <!-- Size: 112 = 7 art lines x LineHeight 16; 96 fits 11 columns of 14px Cascadia Mono / Consolas. -->
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -31,6 +32,7 @@
                LineHeight="16"
                LineStackingStrategy="BlockLineHeight"
                TextWrapping="NoWrap"
+               AutomationProperties.AccessibilityView="Raw"
                IsTextScaleFactorEnabled="False"
                IsTextSelectionEnabled="False" />
 </UserControl>
