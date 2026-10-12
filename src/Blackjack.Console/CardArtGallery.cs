@@ -23,6 +23,8 @@ internal sealed class CardArtGallery
     public IReadOnlyList<string> GetArt(Card card) =>
         GetArtByIndex(card.IsFaceUp ? card.Index : CardBackIndex);
 
+    public IReadOnlyList<string> GetCardBack() => GetArtByIndex(CardBackIndex);
+
     private IReadOnlyList<string> GetArtByIndex(int index)
     {
         int start = index * CardHeight;
