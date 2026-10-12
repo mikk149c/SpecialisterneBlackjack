@@ -19,15 +19,6 @@ internal sealed class ScreenRenderer
     private const int TableWidth = Width - TableX;
     private const int PlayAreaTop = 3;
 
-    private static readonly (char Key, string Label, Func<GameController, bool> IsEnabled)[] Actions =
-    {
-        ('B', "Place Bet", controller => controller.CanPlaceBet),
-        ('H', "Hit", controller => controller.CanHit),
-        ('S', "Stand", controller => controller.CanStand),
-        ('D', "Double Down", controller => controller.CanDoubleDown),
-        ('Q', "Quit", _ => true),
-    };
-
     private readonly CardArtGallery _gallery;
 
     public ScreenRenderer(CardArtGallery gallery)
@@ -99,10 +90,10 @@ internal sealed class ScreenRenderer
         System.Console.SetCursorPosition(x, y + 2);
         System.Console.Write(' ');
         int used = 1;
-        foreach (var (key, label, isEnabled) in Actions)
+        foreach (var action in GameActions.All)
         {
-            string segment = $"[{key}] {label}  ";
-            System.Console.ForegroundColor = isEnabled(controller) ? ConsoleColor.White : ConsoleColor.DarkGray;
+            string segment = $"{action.DisplayText}  ";
+            System.Console.ForegroundColor = action.IsEnabled(controller) ? ConsoleColor.White : ConsoleColor.DarkGray;
             System.Console.Write(segment);
             used += segment.Length;
         }
