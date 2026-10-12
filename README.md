@@ -47,6 +47,7 @@ console front end.
 src/
   Blackjack.Game/       Game engine (rules, dealing, betting, outcomes) - the GUI-independent core
   Blackjack.Console/     Console front end that will consume the engine
+  Blackjack.WinUI/       WinUI 3 front end (unpackaged, Windows only)
 tests/
   Blackjack.Game.Tests/ xUnit tests for the engine
 ```
@@ -199,6 +200,15 @@ classDiagram
 ```
 dotnet build
 dotnet test
+```
+
+## Running the WinUI app
+
+The WinUI 3 front end is unpackaged and self-contained, so no MSIX packaging or
+Visual Studio is needed; the .NET SDK on Windows is enough.
+
+```
+dotnet run --project src/Blackjack.WinUI -r win-x64
 ```
 
 ## Status
