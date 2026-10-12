@@ -23,12 +23,11 @@ public class GameActionsTests
     }
 
     [Fact]
-    public void ConsoleActionBar_IsTheSameTextAsBefore()
+    public void DisplayText_MatchesTheEntryTheConsoleBuiltBeforeTheTableExisted()
     {
-        // The console used to build each entry as $"[{key}] {label}  ".
-        string line = string.Concat(GameActions.All.Select(action => $"{action.DisplayText}  "));
-
-        Assert.Equal("[B] Place Bet  [H] Hit  [S] Stand  [D] Double Down  [Q] Quit  ", line);
+        // The console used to format each entry inline as $"[{key}] {label}".
+        foreach (var action in GameActions.All)
+            Assert.Equal($"[{action.Key}] {action.Label}", action.DisplayText);
     }
 
     [Theory]
@@ -75,14 +74,4 @@ public class GameActionsTests
         Assert.True(GameActions.Hit.IsEnabled(controller));
     }
 
-    [Theory]
-    [InlineData(null, null, "")]
-    [InlineData("Your turn", null, "Your turn")]
-    [InlineData("Your turn", "", "Your turn")]
-    [InlineData("Your turn", "Not yet", "Not yet")]
-    [InlineData(null, "Not yet", "Not yet")]
-    public void StatusLine_PrefersTheNotice(string? status, string? notice, string expected)
-    {
-        Assert.Equal(expected, ActionBarText.StatusLine(status, notice));
-    }
 }

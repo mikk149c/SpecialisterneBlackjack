@@ -17,10 +17,10 @@ namespace Blackjack.WinUI.Controls;
 public sealed partial class ActionBar : UserControl
 {
     public static readonly DependencyProperty ControllerProperty = DependencyProperty.Register(
-        nameof(Controller), typeof(GameController), typeof(ActionBar), new PropertyMetadata(null));
+        nameof(Controller), typeof(GameController), typeof(ActionBar),
+        new PropertyMetadata(null, OnControllerChanged));
 
-    public static readonly DependencyProperty NoticeProperty = DependencyProperty.Register(
-        nameof(Notice), typeof(string), typeof(ActionBar), new PropertyMetadata(string.Empty));
+    private ActionBarStatus? _status;
 
     public ActionBar()
     {
@@ -45,11 +45,20 @@ public sealed partial class ActionBar : UserControl
         set => SetValue(ControllerProperty, value);
     }
 
-    /// <summary>A front-end message shown in place of the controller's status while it is not empty.</summary>
-    public string Notice
+    /// <summary>
+    /// Shows <paramref name="notice"/> in the status line until the controller next changes state;
+    /// the controller's own messages are never hidden for longer than that.
+    /// </summary>
+    public void ShowNotice(string notice) => _status?.ShowNotice(notice);
+
+    private static void OnControllerChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) =>
+        ((ActionBar)sender).BindStatus((GameController)e.NewValue);
+
+    private void BindStatus(GameController controller)
     {
-        get => (string)GetValue(NoticeProperty);
-        set => SetValue(NoticeProperty, value);
+        _status = new ActionBarStatus(controller);
+        _status.PropertyChanged += (_, _) => StatusText.Text = _status.Text;
+        StatusText.Text = _status.Text;
     }
 
     private static void Attach(Button button, GameAction action)

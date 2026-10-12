@@ -34,9 +34,9 @@ public sealed partial class MainWindow : Window
     public IReadOnlyList<string> CardBackLines { get; }
 
     // Stand-in until the bet dialog exists (issue #11, which replaces this handler): say so in the
-    // status line instead of silently ignoring the key.
+    // status line instead of silently ignoring the key. The notice clears on the next game update.
     private void OnPlaceBetRequested(object? sender, EventArgs e) =>
-        Actions.Notice = "Bet entry is not available yet.";
+        Actions.ShowNotice("Bet entry is not available yet.");
 
     // Window.Close, not Application.Exit: it runs the window's Closed handlers (so the lifecycle
     // work in issue #12 can hook there) and ends the app because this is its only window.
