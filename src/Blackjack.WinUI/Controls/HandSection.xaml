@@ -1,0 +1,31 @@
+<UserControl
+    x:Class="Blackjack.WinUI.Controls.HandSection"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    IsTabStop="False">
+    <!-- One header line over a row of CardViews. The row is at least one card tall so an empty hand takes
+         the same space as a dealt one (MinHeight and the card gap are set in code from named constants).
+         The header is decorative for screen readers: the control's AutomationProperties.Name carries the
+         same information (set in code from HandSectionText). -->
+    <StackPanel Spacing="4">
+        <TextBlock x:Name="HeaderText"
+                   AutomationProperties.AccessibilityView="Raw"
+                   FontFamily="Cascadia Mono, Consolas"
+                   FontSize="14"
+                   IsTextScaleFactorEnabled="False"
+                   Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+
+        <!-- Cards never wrap. 8 cards fit the default window beside the deck; beyond that the row scrolls
+             horizontally instead of clipping. The viewer becomes a tab stop (code-behind) only when there is
+             something to scroll, so keyboard users can focus it and use the arrow keys. -->
+        <ScrollViewer x:Name="CardScroller"
+                      HorizontalScrollBarVisibility="Auto"
+                      HorizontalScrollMode="Auto"
+                      VerticalScrollBarVisibility="Disabled"
+                      VerticalScrollMode="Disabled"
+                      IsTabStop="False"
+                      UseSystemFocusVisuals="True">
+            <StackPanel x:Name="CardRow" Orientation="Horizontal" />
+        </ScrollViewer>
+    </StackPanel>
+</UserControl>

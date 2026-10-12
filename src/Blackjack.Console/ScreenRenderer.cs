@@ -72,7 +72,7 @@ internal sealed class ScreenRenderer
 
     private void WriteHandSectionAt(int x, int y, string title, IReadOnlyList<Card> cards, string valueLabel)
     {
-        WriteAt(x, y, PadTrunc($" -- {title} ({valueLabel}) --", TableWidth));
+        WriteAt(x, y, PadTrunc($" {HandSectionText.Header(title, valueLabel)}", TableWidth));
 
         if (cards.Count == 0)
         {
