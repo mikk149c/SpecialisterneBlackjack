@@ -1,4 +1,5 @@
 using Blackjack.Game;
+using Blackjack.Presentation;
 
 namespace Blackjack.Console;
 
@@ -21,52 +22,41 @@ internal sealed class ScreenRenderer
     private const int TableWidth = Width - TableX;
     private const int PlayAreaTop = 3;
 
-    private static readonly (char Key, string Label, Func<IBlackjackGame, bool> IsEnabled)[] Actions =
+    private static readonly (char Key, string Label, Func<GameController, bool> IsEnabled)[] Actions =
     {
-        ('B', "Place Bet", game => !game.IsRoundInProgress),
-        ('H', "Hit", game => game.IsRoundInProgress),
-        ('S', "Stand", game => game.IsRoundInProgress),
-        ('D', "Double Down", game => game.IsRoundInProgress
-            && game.PlayerHand.Cards.Count == 2
-            && game.Balance >= game.CurrentBet),
+        ('B', "Place Bet", controller => controller.CanPlaceBet),
+        ('H', "Hit", controller => controller.CanHit),
+        ('S', "Stand", controller => controller.CanStand),
+        ('D', "Double Down", controller => controller.CanDoubleDown),
         ('Q', "Quit", _ => true),
     };
 
     private readonly CardArtGallery _gallery;
-
-    // Tracks the previous frame's cards-remaining count so a refill (the
-    // count going up instead of down) can be flagged for one frame.
-    private int? _previousCardsRemaining;
 
     public ScreenRenderer(CardArtGallery gallery)
     {
         _gallery = gallery;
     }
 
-    public void Render(IBlackjackGame game, string status)
+    public void Render(GameController controller)
     {
         try { System.Console.Clear(); }
         catch (IOException) { }
 
-        int cardsRemaining = game.GetCardsRemaining();
-        bool justRefilled = _previousCardsRemaining is int previous && cardsRemaining > previous;
-        _previousCardsRemaining = cardsRemaining;
+        WriteHeader(controller);
 
-        WriteHeader(game);
+        WriteDeckColumn(LeftMargin, PlayAreaTop, controller.CardsRemaining, controller.JustRefilled);
 
-        WriteDeckColumn(LeftMargin, PlayAreaTop, cardsRemaining, justRefilled);
-
-        WriteHandSectionAt(TableX, PlayAreaTop, "PLAYER", game.PlayerHand.Cards, PlayerValueLabel(game));
-        WriteActionBarAt(TableX, PlayAreaTop + 9, game, status);
-        WriteHandSectionAt(TableX, PlayAreaTop + 14, "DEALER", game.DealerHand.Cards, DealerValueLabel(game));
+        WriteHandSectionAt(TableX, PlayAreaTop, "PLAYER", controller.PlayerCards, controller.PlayerValueLabel);
+        WriteActionBarAt(TableX, PlayAreaTop + 9, controller);
+        WriteHandSectionAt(TableX, PlayAreaTop + 14, "DEALER", controller.DealerCards, controller.DealerValueLabel);
 
         System.Console.SetCursorPosition(0, PlayAreaTop + 22);
     }
 
-    private static void WriteHeader(IBlackjackGame game)
+    private static void WriteHeader(GameController controller)
     {
-        string lastRound = game.LastOutcome?.ToString() ?? "-";
-        WriteAt(0, 0, PadTrunc($" Balance: {game.Balance,-8} Bet: {game.CurrentBet,-6} Last Round: {lastRound,-12}", Width));
+        WriteAt(0, 0, PadTrunc($" Balance: {controller.Balance,-8} Bet: {controller.CurrentBet,-6} Last Round: {controller.LastRoundLabel,-12}", Width));
         WriteAt(0, 1, new string('=', Width));
     }
 
@@ -137,10 +127,10 @@ internal sealed class ScreenRenderer
         }
     }
 
-    private static void WriteActionBarAt(int x, int y, IBlackjackGame game, string status)
+    private static void WriteActionBarAt(int x, int y, GameController controller)
     {
         WriteAt(x, y, new string('-', TableWidth));
-        WriteAt(x, y + 1, PadTrunc($" {status}", TableWidth));
+        WriteAt(x, y + 1, PadTrunc($" {controller.Status}", TableWidth));
 
         System.Console.SetCursorPosition(x, y + 2);
         System.Console.Write(' ');
@@ -148,7 +138,7 @@ internal sealed class ScreenRenderer
         foreach (var (key, label, isEnabled) in Actions)
         {
             string segment = $"[{key}] {label}  ";
-            System.Console.ForegroundColor = isEnabled(game) ? ConsoleColor.White : ConsoleColor.DarkGray;
+            System.Console.ForegroundColor = isEnabled(controller) ? ConsoleColor.White : ConsoleColor.DarkGray;
             System.Console.Write(segment);
             used += segment.Length;
         }
@@ -158,28 +148,6 @@ internal sealed class ScreenRenderer
 
         WriteAt(x, y + 3, new string('-', TableWidth));
     }
-
-    private static string PlayerValueLabel(IBlackjackGame game) =>
-        game.PlayerHand.Cards.Count == 0 ? "-" : game.PlayerHand.Value.ToString();
-
-    private static string DealerValueLabel(IBlackjackGame game)
-    {
-        if (game.DealerHand.Cards.Count == 0)
-            return "-";
-
-        if (game.IsDealerHoleCardRevealed)
-            return game.DealerHand.Value.ToString();
-
-        int visible = game.DealerHand.Cards.Where(card => card.IsFaceUp).Sum(CardPipValue);
-        return $"{visible} + ?";
-    }
-
-    private static int CardPipValue(Card card) => card.Rank switch
-    {
-        Rank.Jack or Rank.Queen or Rank.King => 10,
-        Rank.Ace => 11,
-        _ => (int)card.Rank,
-    };
 
     private static string Center(string text, int width)
     {
