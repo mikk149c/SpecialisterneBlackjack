@@ -14,9 +14,15 @@ namespace Blackjack.WinUI.Controls;
 /// <para>
 /// <see cref="Card.IsFaceUp"/> is mutable and cannot be observed, and
 /// <see cref="Card"/> has reference equality, so assigning a list holding the
-/// same instances raises no change. After the engine flips or deals cards the
-/// owner must call <see cref="Refresh"/> (re-assigning <see cref="Cards"/> with
-/// a different list instance also works).
+/// same instances raises no change. <c>GameController.UpdateCards</c> already
+/// returns a new array whenever a card's <c>IsFaceUp</c> changes, so binding
+/// <see cref="Cards"/> to <c>PlayerCards</c>/<c>DealerCards</c> re-renders
+/// without help. <see cref="Refresh"/> is only needed by callers that hold on
+/// to the same list instance and mutate cards behind it.
+/// </para>
+/// <para>
+/// More cards than fit scroll horizontally; the scroll viewer then becomes a
+/// tab stop with a focus visual and scrolls with the arrow keys.
 /// </para>
 /// </summary>
 public sealed partial class HandSection : UserControl
@@ -33,9 +39,19 @@ public sealed partial class HandSection : UserControl
         nameof(Cards), typeof(IReadOnlyList<Card>), typeof(HandSection),
         new PropertyMetadata(null, OnDisplayInputChanged));
 
+    // One character cell of the 14 px monospace font the cards are drawn in.
+    private const double CardGap = 8;
+
+    // CardView.Height (7 art lines x 16 px): an empty row keeps the height of a dealt one.
+    private const double CardRowHeight = 112;
+
     public HandSection()
     {
         InitializeComponent();
+        CardRow.Spacing = CardGap;
+        CardScroller.MinHeight = CardRowHeight;
+        CardScroller.SizeChanged += (_, _) => UpdateScrollerTabStop();
+        CardRow.SizeChanged += (_, _) => UpdateScrollerTabStop();
         Refresh();
     }
 
@@ -91,10 +107,17 @@ public sealed partial class HandSection : UserControl
             CardRow.Children.Add(new CardView());
     }
 
-    // Assigning the same instance raises no change, hence the explicit refresh.
+    // Assigning the same instance raises no change, so only then refresh explicitly
+    // (a different card already re-renders through the property callback).
     private static void ShowCard(CardView view, Card card)
     {
-        view.Card = card;
-        view.Refresh();
+        if (ReferenceEquals(view.Card, card))
+            view.Refresh();
+        else
+            view.Card = card;
     }
+
+    // Only a row wider than its viewport needs keyboard focus; otherwise it would be a useless tab stop.
+    private void UpdateScrollerTabStop() =>
+        CardScroller.IsTabStop = CardScroller.ExtentWidth > CardScroller.ViewportWidth;
 }

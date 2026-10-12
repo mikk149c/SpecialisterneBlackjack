@@ -3,10 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     IsTabStop="False">
-    <!-- One header line over a row of CardViews. The row is at least one card tall (CardView.Height = 112)
-         so an empty hand takes the same space as a dealt one and the layout does not jump when a round
-         starts. The header is decorative for screen readers: the control's AutomationProperties.Name
-         carries the same information (set in code from HandSectionText). -->
+    <!-- One header line over a row of CardViews. The row is at least one card tall so an empty hand takes
+         the same space as a dealt one (MinHeight and the card gap are set in code from named constants).
+         The header is decorative for screen readers: the control's AutomationProperties.Name carries the
+         same information (set in code from HandSectionText). -->
     <StackPanel Spacing="4">
         <TextBlock x:Name="HeaderText"
                    AutomationProperties.AccessibilityView="Raw"
@@ -15,16 +15,17 @@
                    IsTextScaleFactorEnabled="False"
                    Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
 
-        <!-- Cards never wrap. 8 cards (8 x 96 + 7 x 8 = 824 px) fit the default window beside the deck;
-             beyond that the row scrolls horizontally instead of clipping. -->
-        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+        <!-- Cards never wrap. 8 cards fit the default window beside the deck; beyond that the row scrolls
+             horizontally instead of clipping. The viewer becomes a tab stop (code-behind) only when there is
+             something to scroll, so keyboard users can focus it and use the arrow keys. -->
+        <ScrollViewer x:Name="CardScroller"
+                      HorizontalScrollBarVisibility="Auto"
                       HorizontalScrollMode="Auto"
                       VerticalScrollBarVisibility="Disabled"
                       VerticalScrollMode="Disabled"
-                      MinHeight="112">
-            <StackPanel x:Name="CardRow"
-                        Orientation="Horizontal"
-                        Spacing="8" />
+                      IsTabStop="False"
+                      UseSystemFocusVisuals="True">
+            <StackPanel x:Name="CardRow" Orientation="Horizontal" />
         </ScrollViewer>
     </StackPanel>
 </UserControl>
