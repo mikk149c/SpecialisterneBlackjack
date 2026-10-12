@@ -1,0 +1,36 @@
+<UserControl
+    x:Class="Blackjack.WinUI.Controls.CardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="96"
+    Height="112"
+    IsTabStop="False">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="CardRedBrush" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="CardBackBrush" Color="#8A6D00" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CardRedBrush" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="CardBackBrush" Color="#8A6D00" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CardRedBrush" Color="#FF6B6B" />
+                    <SolidColorBrush x:Key="CardBackBrush" Color="#D4A72C" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <TextBlock x:Name="ArtText"
+               FontFamily="Cascadia Mono, Consolas"
+               FontSize="14"
+               LineHeight="16"
+               LineStackingStrategy="BlockLineHeight"
+               TextWrapping="NoWrap"
+               IsTextScaleFactorEnabled="False"
+               IsTextSelectionEnabled="False" />
+</UserControl>

@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blackjack.Game\Blackjack.Game.csproj" />
+    <ProjectReference Include="..\Blackjack.Presentation\Blackjack.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
