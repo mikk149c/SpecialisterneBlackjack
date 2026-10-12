@@ -3,6 +3,7 @@
     <Project Path="src/Blackjack.Console/Blackjack.Console.csproj" />
     <Project Path="src/Blackjack.Game/Blackjack.Game.csproj" />
     <Project Path="src/Blackjack.Presentation/Blackjack.Presentation.csproj" />
+    <Project Path="src/Blackjack.WinUI/Blackjack.WinUI.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Blackjack.Game.Tests/Blackjack.Game.Tests.csproj" />
