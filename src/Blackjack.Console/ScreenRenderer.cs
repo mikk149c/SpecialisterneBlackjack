@@ -12,10 +12,7 @@ namespace Blackjack.Console;
 internal sealed class ScreenRenderer
 {
     private const int Width = 96;
-    private const int StackLayers = 3;
-    private const int DeckWidth = CardArtGallery.CardWidth + (StackLayers - 1);
-    private const int DeckHeight = CardArtGallery.CardHeight + (StackLayers - 1);
-    private const int DeckLabelRow = CardArtGallery.CardHeight / 2;
+    private const int DeckWidth = DeckStackLayout.Width;
     private const int LeftMargin = 1;
     private const int Gap = 2;
     private const int TableX = LeftMargin + DeckWidth + Gap;
@@ -64,46 +61,13 @@ internal sealed class ScreenRenderer
     {
         ConsoleColor color = justRefilled ? ConsoleColor.Green : ConsoleColor.DarkYellow;
 
-        WriteAt(x, y, PadTrunc(Center("DECK", DeckWidth), DeckWidth), color);
+        WriteAt(x, y, PadTrunc(DeckStackLayout.TitleLine, DeckWidth), color);
 
-        var stack = BuildDeckStackLines(_gallery.GetCardBack());
+        var label = DeckStackLayout.LabelFor(cardsRemaining, justRefilled);
+        var stack = DeckStackLayout.Build(_gallery.GetCardBack(), label);
 
-        string label = justRefilled ? "REFILLED" : cardsRemaining.ToString();
-        string overlay = "|" + Center(label, CardArtGallery.CardWidth - 2) + "|";
-        stack[DeckLabelRow] = overlay + stack[DeckLabelRow][CardArtGallery.CardWidth..];
-
-        for (int row = 0; row < stack.Length; row++)
+        for (int row = 0; row < stack.Count; row++)
             WriteAt(x, y + 1 + row, PadTrunc(stack[row], DeckWidth), color);
-    }
-
-    // Layers a few offset copies of the card-back art on top of each other so
-    // the deck reads as a stack of cards rather than a single card.
-    private static string[] BuildDeckStackLines(IReadOnlyList<string> cardBack)
-    {
-        var grid = new char[DeckHeight, DeckWidth];
-        for (int r = 0; r < DeckHeight; r++)
-            for (int c = 0; c < DeckWidth; c++)
-                grid[r, c] = ' ';
-
-        for (int layer = StackLayers - 1; layer >= 0; layer--)
-        {
-            for (int r = 0; r < CardArtGallery.CardHeight; r++)
-            {
-                string line = cardBack[r];
-                for (int c = 0; c < CardArtGallery.CardWidth; c++)
-                    grid[r + layer, c + layer] = line[c];
-            }
-        }
-
-        var result = new string[DeckHeight];
-        for (int r = 0; r < DeckHeight; r++)
-        {
-            var sb = new System.Text.StringBuilder(DeckWidth);
-            for (int c = 0; c < DeckWidth; c++)
-                sb.Append(grid[r, c]);
-            result[r] = sb.ToString();
-        }
-        return result;
     }
 
     private void WriteHandSectionAt(int x, int y, string title, IReadOnlyList<Card> cards, string valueLabel)
@@ -147,17 +111,6 @@ internal sealed class ScreenRenderer
             System.Console.Write(new string(' ', TableWidth - used));
 
         WriteAt(x, y + 3, new string('-', TableWidth));
-    }
-
-    private static string Center(string text, int width)
-    {
-        if (text.Length >= width)
-            return text[..width];
-
-        int totalPad = width - text.Length;
-        int left = totalPad / 2;
-        int right = totalPad - left;
-        return new string(' ', left) + text + new string(' ', right);
     }
 
     // Pads/truncates a line to a fixed width so redrawing in place never
