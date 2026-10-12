@@ -53,7 +53,7 @@ internal sealed class ScreenRenderer
 
     private static void WriteHeader(GameController controller)
     {
-        WriteAt(0, 0, PadTrunc($" Balance: {controller.Balance,-8} Bet: {controller.CurrentBet,-6} Last Round: {controller.LastRoundLabel,-12}", Width));
+        WriteAt(0, 0, PadTrunc(HeaderBarText.ConsoleLine(controller.Balance, controller.CurrentBet, controller.LastRoundLabel), Width));
         WriteAt(0, 1, new string('=', Width));
     }
 
