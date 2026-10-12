@@ -54,14 +54,14 @@ public sealed partial class ActionBar : UserControl
 
     private static void Attach(Button button, GameAction action)
     {
-        var accelerator = new KeyboardAccelerator
+        // Letter keys share their code with the upper-case character. Shift is accepted as well so a
+        // capital H works like h (case-insensitive); Ctrl and Alt combinations stay free for the system.
+        foreach (var modifiers in new[] { VirtualKeyModifiers.None, VirtualKeyModifiers.Shift })
         {
-            // Letter keys share their code with the upper-case character; modifiers stay None.
-            Key = (VirtualKey)action.Key,
-            Modifiers = VirtualKeyModifiers.None,
-        };
-        accelerator.Invoked += OnAcceleratorInvoked;
-        button.KeyboardAccelerators.Add(accelerator);
+            var accelerator = new KeyboardAccelerator { Key = (VirtualKey)action.Key, Modifiers = modifiers };
+            accelerator.Invoked += OnAcceleratorInvoked;
+            button.KeyboardAccelerators.Add(accelerator);
+        }
     }
 
     // Marking the invocation handled stops the button from being clicked. Typing in a text box and
