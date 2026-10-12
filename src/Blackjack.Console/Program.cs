@@ -1,97 +1,62 @@
 using Blackjack.Console;
-using Blackjack.Game;
+using Blackjack.Presentation;
 
 TrySetOutputEncoding();
 TrySetCursorVisible(false);
 TrySetTitle("Blackjack");
 
 var cardArtPath = Path.Combine(AppContext.BaseDirectory, "Assets", "CardArt.txt");
-var gallery = new CardArtGallery(cardArtPath);
-var renderer = new ScreenRenderer(gallery);
+var renderer = new ScreenRenderer(new CardArtGallery(cardArtPath));
+var controller = GameController.CreateDefault();
 
-var factory = new GameFactory();
-
-
-IBlackjackGame game = factory.CreateGame(GameFactory.DefaultStartingBalance);
-game.ShuffleDeck();
-
-var status = "Place your bet to start the first round.";
 var running = true;
 
 while (running)
 {
-    // `deck` is kept as a side reference purely so the header can show cards
-    // remaining - see the TODO in ScreenRenderer.WriteHeader.
-    renderer.Render(game, status);
+    renderer.Render(controller);
     var key = System.Console.ReadKey(intercept: true).Key;
-    status = HandleKey(key, game, status, ref running);
-    if(game.GetCardsRemaining() < 15)
-    {
-        game.NewDeck();
-        game.ShuffleDeck();
-    }
+    running = HandleKey(key, controller);
 }
 
 TrySetCursorVisible(true);
 System.Console.WriteLine();
 System.Console.WriteLine("Thanks for playing!");
 
-static string HandleKey(ConsoleKey key, IBlackjackGame game, string currentStatus, ref bool running)
+// Returns false when the player asked to quit.
+static bool HandleKey(ConsoleKey key, GameController controller)
 {
     switch (key)
     {
-        case ConsoleKey.H when game.IsRoundInProgress:
-            game.Hit();
-            return game.IsRoundInProgress
-                ? "Your turn: Hit, Stand, or Double Down."
-                : DescribeOutcome(game);
+        case ConsoleKey.H:
+            controller.Hit();
+            break;
 
-        case ConsoleKey.S when game.IsRoundInProgress:
-            game.Stand();
-            return DescribeOutcome(game);
+        case ConsoleKey.S:
+            controller.Stand();
+            break;
 
-        case ConsoleKey.D when game.IsRoundInProgress && game.PlayerHand.Cards.Count == 2:
-            try
-            {
-                game.DoubleDown();
-                return DescribeOutcome(game);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return ex.Message;
-            }
+        case ConsoleKey.D:
+            controller.DoubleDown();
+            break;
 
-        case ConsoleKey.B when !game.IsRoundInProgress:
-            return PromptForBet(game);
+        case ConsoleKey.B when controller.CanPlaceBet:
+            controller.PlaceBet(PromptForBet(controller.Balance));
+            break;
 
         case ConsoleKey.Q:
-            running = false;
-            return "Goodbye!";
-
-        default:
-            return currentStatus;
+            return false;
     }
+
+    return true;
 }
 
-static string PromptForBet(IBlackjackGame game)
+static string? PromptForBet(int balance)
 {
     TrySetCursorVisible(true);
-    System.Console.Write($"\n Enter bet amount (balance {game.Balance}): ");
+    System.Console.Write($"\n Enter bet amount (balance {balance}): ");
     var input = System.Console.ReadLine();
     TrySetCursorVisible(false);
-
-    if (!int.TryParse(input, out var amount))
-        return "Invalid bet amount - enter a whole number.";
-
-    try
-    {
-        game.PlaceBet(amount);
-        return "Your turn: Hit, Stand, or Double Down.";
-    }
-    catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException)
-    {
-        return ex.Message;
-    }
+    return input;
 }
 
 static void TrySetCursorVisible(bool visible)
@@ -113,12 +78,3 @@ static void TrySetTitle(string title)
     catch (IOException) { }
     catch (PlatformNotSupportedException) { }
 }
-
-static string DescribeOutcome(IBlackjackGame game) => game.LastOutcome switch
-{
-    RoundOutcome.PlayerWin => "You win! Press [B] to play again.",
-    RoundOutcome.DealerWin => "Dealer wins. Press [B] to play again.",
-    RoundOutcome.Blackjack => "Blackjack! You win 3:2. Press [B] to play again.",
-    RoundOutcome.Push => "Push - bet returned. Press [B] to play again.",
-    _ => "Round resolved. Press [B] to play again.",
-};
