@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Blackjack.WinUI": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
