@@ -379,6 +379,10 @@ packaging, Visual Studio workload or separate runtime install is needed.
 dotnet run --project src/Blackjack.WinUI -r win-x64
 ```
 
+A launch profile named `Blackjack.WinUI` is defined in
+`src/Blackjack.WinUI/Properties/launchSettings.json`, so
+`dotnet run --project src/Blackjack.WinUI --launch-profile Blackjack.WinUI` also works.
+
 Or build once and start the exe. The output folder depends on how you built:
 
 | Build | Exe location (under `src\Blackjack.WinUI\`) |
