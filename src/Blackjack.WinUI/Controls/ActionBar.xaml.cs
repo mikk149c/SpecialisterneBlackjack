@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Blackjack.Presentation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -20,11 +21,15 @@ public sealed partial class ActionBar : UserControl
         nameof(Controller), typeof(GameController), typeof(ActionBar),
         new PropertyMetadata(null, OnControllerChanged));
 
+    private readonly Button[] _gameButtons;
     private ActionBarStatus? _status;
 
     public ActionBar()
     {
         InitializeComponent();
+
+        // Display order, without Quit: focus must never be handed to the button that ends the game.
+        _gameButtons = new[] { PlaceBetButton, HitButton, StandButton, DoubleDownButton };
         Attach(PlaceBetButton, GameActions.PlaceBet);
         Attach(HitButton, GameActions.Hit);
         Attach(StandButton, GameActions.Stand);
@@ -52,12 +57,13 @@ public sealed partial class ActionBar : UserControl
     public void ShowNotice(string notice) => _status?.ShowNotice(notice);
 
     /// <summary>
-    /// Moves keyboard focus to the first enabled action button, in display order. After a bet that
-    /// starts a round that is Hit; after a rejected bet it is Place Bet again.
+    /// Moves keyboard focus to the first enabled game action (Place Bet, Hit, Stand, Double Down),
+    /// in display order, never to Quit. After a bet that starts a round that is Hit; after a round
+    /// ends or a bet is rejected it is Place Bet. The bar calls this itself when its state changes.
     /// </summary>
     public void FocusFirstEnabledAction()
     {
-        foreach (var button in new[] { PlaceBetButton, HitButton, StandButton, DoubleDownButton, QuitButton })
+        foreach (var button in _gameButtons)
         {
             if (button.IsEnabled && button.Focus(FocusState.Programmatic))
                 return;
@@ -70,9 +76,37 @@ public sealed partial class ActionBar : UserControl
     private void BindStatus(GameController controller)
     {
         _status = new ActionBarStatus(controller);
-        _status.PropertyChanged += (_, _) => StatusText.Text = _status.Text;
-        StatusText.Text = _status.Text;
+        _status.PropertyChanged += OnStatusChanged;
+        ApplyStatus(_status);
     }
+
+    private void OnStatusChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        ApplyStatus(_status!);
+        if (e.PropertyName == nameof(ActionBarStatus.CanPlaceBet))
+            RestoreFocusAfterStateChange();
+    }
+
+    private void ApplyStatus(ActionBarStatus status)
+    {
+        StatusText.Text = status.Text;
+        PlaceBetButton.IsEnabled = status.CanPlaceBet;
+    }
+
+    // When the enabled set changes, the focused button may have just been disabled and WinUI would
+    // move focus to the next enabled control, which is Quit. Run after the bindings have applied,
+    // and leave focus alone when it is already on an enabled game action.
+    private void RestoreFocusAfterStateChange() => DispatcherQueue.TryEnqueue(() =>
+    {
+        if (XamlRoot is null)
+            return;
+
+        var focused = FocusManager.GetFocusedElement(XamlRoot) as Button;
+        if (focused is not null && focused.IsEnabled && _gameButtons.Contains(focused))
+            return;
+
+        FocusFirstEnabledAction();
+    });
 
     private static void Attach(Button button, GameAction action)
     {

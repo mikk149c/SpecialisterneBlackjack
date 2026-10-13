@@ -515,6 +515,72 @@ public class GameControllerTests
         Assert.Equal(StartingBalance - 100, balanceSeenOnFirstEvent);
     }
 
+    [Fact]
+    public void Hit_EngineFaults_ShowsSomethingWentWrongInsteadOfThrowing()
+    {
+        var (controller, deck) = ControllerWithFaultyDeck();
+        controller.PlaceBet(100);
+        var raised = Record(controller);
+        deck.FailOnDraw = true;
+
+        controller.Hit();
+
+        Assert.Equal("Something went wrong: deck exploded", controller.Status);
+        Assert.Contains(nameof(GameController.Status), raised);
+        Assert.True(controller.IsRoundInProgress);
+    }
+
+    [Fact]
+    public void PlaceBet_EngineFaults_ShowsSomethingWentWrongInsteadOfThrowing()
+    {
+        var (controller, deck) = ControllerWithFaultyDeck();
+        deck.FailOnDraw = true;
+
+        controller.PlaceBet(100);
+
+        Assert.Equal("Something went wrong: deck exploded", controller.Status);
+    }
+
+    [Fact]
+    public void Stand_AfterAFault_RecoversOnTheNextAction()
+    {
+        var (controller, deck) = ControllerWithFaultyDeck();
+        controller.PlaceBet(100);
+        deck.FailOnDraw = true;
+        controller.Hit();
+        deck.FailOnDraw = false;
+
+        controller.Stand();
+
+        Assert.False(controller.IsRoundInProgress);
+        Assert.DoesNotContain("went wrong", controller.Status);
+    }
+
+    private (GameController Controller, FaultyDeck Deck) ControllerWithFaultyDeck()
+    {
+        var cards = Enumerable.Range(0, 30).Select(_ => Card(Rank.Two, Suit.Clubs));
+        var deck = new FaultyDeck(_factory.CreateDeck(cards));
+        return (new GameController(_factory.CreateGame(StartingBalance, deck)), deck);
+    }
+
+    // Behaves like the wrapped deck until told to fail; stands in for an engine fault. The
+    // exception type is not one the controller treats as a rule violation.
+    private sealed class FaultyDeck(IDeck inner) : IDeck
+    {
+        public bool FailOnDraw { get; set; }
+
+        public int CardsRemaining => inner.CardsRemaining;
+
+        public void Shuffle() => inner.Shuffle();
+
+        public Card DrawCard() =>
+            FailOnDraw ? throw new NotSupportedException("deck exploded") : inner.DrawCard();
+
+        public bool HasCards() => inner.HasCards();
+
+        public void RefreshDeck() => inner.RefreshDeck();
+    }
+
     private static List<string> Record(GameController controller)
     {
         var raised = new List<string>();

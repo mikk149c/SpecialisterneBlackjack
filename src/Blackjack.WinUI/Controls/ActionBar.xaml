@@ -7,9 +7,11 @@
     <!-- Rule, status line, five buttons, rule: the console's action bar. Buttons are declared in
          display order, which is also the tab order. Label, accessible name and key come from
          GameActions; the keyboard accelerators are attached in code from the same table. Enabled
-         states bind per button to the controller's Can* properties. The status line text comes from
-         ActionBarStatus (controller status plus an optional one-shot notice). The status line is a polite live region so a
-         screen reader announces each outcome message. -->
+         states bind per button to the controller's Can* properties, except Place Bet, whose state
+         comes from ActionBarStatus (it is also off when the player is out of credits). The status
+         line text comes from ActionBarStatus (controller status, out-of-credits message, optional
+         one-shot notice). The status line is a polite live region so a screen reader announces
+         each outcome message. -->
     <StackPanel Spacing="4">
         <Rectangle Height="1"
                    AutomationProperties.AccessibilityView="Raw"
@@ -26,7 +28,6 @@
         <StackPanel Orientation="Horizontal" Spacing="8">
             <Button x:Name="PlaceBetButton"
                     Click="OnPlaceBetClick"
-                    IsEnabled="{x:Bind Controller.CanPlaceBet, Mode=OneWay}"
                     KeyboardAcceleratorPlacementMode="Hidden"
                     Content="{x:Bind presentation:GameActions.PlaceBet.DisplayText}"
                     AutomationProperties.Name="{x:Bind presentation:GameActions.PlaceBet.Label}"
