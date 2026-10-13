@@ -243,6 +243,103 @@ public class GameControllerTests
     }
 
     [Fact]
+    public void Stand_PlayerBlackjack_PaysThreeToTwoAndEndsRound()
+    {
+        var controller = ControllerWith(StartingBalance,
+            Card(Rank.Ace, Suit.Hearts), Card(Rank.Ten, Suit.Spades),
+            Card(Rank.King, Suit.Hearts), Card(Rank.Seven, Suit.Spades));
+        controller.PlaceBet(100);
+
+        controller.Stand();
+
+        Assert.Equal(StartingBalance + 150, controller.Balance);
+        Assert.Equal(0, controller.CurrentBet);
+        Assert.False(controller.IsRoundInProgress);
+        Assert.True(controller.CanPlaceBet);
+        Assert.False(controller.CanHit);
+        Assert.False(controller.CanStand);
+        Assert.False(controller.CanDoubleDown);
+    }
+
+    [Fact]
+    public void Stand_AllInAndLose_LeavesZeroBalanceAndAllowsBettingAgainAtTheController()
+    {
+        var controller = ControllerWith(StartingBalance,
+            Card(Rank.Ten, Suit.Hearts), Card(Rank.Ten, Suit.Spades),
+            Card(Rank.Seven, Suit.Hearts), Card(Rank.Nine, Suit.Spades));
+        controller.PlaceBet(StartingBalance);
+
+        controller.Stand();
+
+        Assert.Equal("Dealer wins. Press [B] to play again.", controller.Status);
+        Assert.Equal(0, controller.Balance);
+        Assert.True(controller.CanPlaceBet);
+    }
+
+    [Fact]
+    public void PlaceBet_ValidBetAfterRejectedBet_ClearsTheErrorAndStartsRound()
+    {
+        var controller = PlayerWinningScenario();
+        controller.PlaceBet("abc");
+
+        controller.PlaceBet("100");
+
+        Assert.Equal(StatusMessages.PlayerTurn, controller.Status);
+        Assert.True(controller.IsRoundInProgress);
+    }
+
+    [Fact]
+    public void Hit_Bust_RevealsHoleCardAndShowsFullDealerValue()
+    {
+        var controller = ControllerWith(StartingBalance,
+            Card(Rank.Ten, Suit.Hearts), Card(Rank.Eight, Suit.Spades),
+            Card(Rank.Six, Suit.Hearts), Card(Rank.King, Suit.Spades),
+            Card(Rank.King, Suit.Hearts));
+        controller.PlaceBet(100);
+        Assert.Equal("10 + ?", controller.DealerValueLabel);
+
+        controller.Hit();
+
+        Assert.Equal("26", controller.PlayerValueLabel);
+        Assert.Equal("18", controller.DealerValueLabel);
+        Assert.All(controller.DealerCards, card => Assert.True(card.IsFaceUp));
+        Assert.False(controller.CanHit);
+        Assert.True(controller.CanPlaceBet);
+    }
+
+    [Fact]
+    public void DoubleDown_Bust_LosesTheDoubledStake()
+    {
+        var controller = ControllerWith(StartingBalance,
+            Card(Rank.Ten, Suit.Hearts), Card(Rank.Ten, Suit.Spades),
+            Card(Rank.Six, Suit.Hearts), Card(Rank.Seven, Suit.Spades),
+            Card(Rank.King, Suit.Hearts));
+        controller.PlaceBet(100);
+
+        controller.DoubleDown();
+
+        Assert.Equal("Dealer wins. Press [B] to play again.", controller.Status);
+        Assert.Equal(StartingBalance - 200, controller.Balance);
+        Assert.Equal(3, controller.PlayerCards.Count);
+        Assert.Equal("26", controller.PlayerValueLabel);
+    }
+
+    [Fact]
+    public void CanDoubleDown_BalanceEqualsBet_IsTrueAndDoubleDownSucceeds()
+    {
+        var controller = PlayerWinningScenario();
+        controller.PlaceBet(500);
+        Assert.Equal(500, controller.Balance);
+        Assert.True(controller.CanDoubleDown);
+
+        controller.DoubleDown();
+
+        // Drawn card is the filler Two: 19 + 2 = 21 beats the dealer's 18.
+        Assert.Equal("You win! Press [B] to play again.", controller.Status);
+        Assert.Equal(StartingBalance + 1000, controller.Balance);
+    }
+
+    [Fact]
     public void DoubleDown_WithEnoughBalance_ResolvesRoundWithOutcomeMessage()
     {
         var controller = ControllerWith(StartingBalance,
