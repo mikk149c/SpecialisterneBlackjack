@@ -1,4 +1,5 @@
 using Blackjack.Presentation;
+using Blackjack.WinUI.Dialogs;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Windows.Graphics;
@@ -18,6 +19,8 @@ public sealed partial class MainWindow : Window
     private const int MinimumWidth = 1000;
     private const int MinimumHeight = 560;
 
+    private bool _isBetDialogOpen;
+
     public MainWindow(GameController controller, IReadOnlyList<string> cardBackLines)
     {
         Controller = controller;
@@ -33,10 +36,30 @@ public sealed partial class MainWindow : Window
     /// <summary>Card-back art for the deck stack.</summary>
     public IReadOnlyList<string> CardBackLines { get; }
 
-    // Stand-in until the bet dialog exists (issue #11, which replaces this handler): say so in the
-    // status line instead of silently ignoring the key. The notice clears on the next game update.
-    private void OnPlaceBetRequested(object? sender, EventArgs e) =>
-        Actions.ShowNotice("Bet entry is not available yet.");
+    // WinUI throws if a second ContentDialog is shown while one is open, and the B key auto-repeats
+    // while held, so a request that arrives while the dialog is up is dropped. The flag is reset in
+    // finally so a failed ShowAsync cannot lock betting for the rest of the session.
+    private async void OnPlaceBetRequested(object? sender, EventArgs e)
+    {
+        if (_isBetDialogOpen)
+            return;
+
+        _isBetDialogOpen = true;
+        try
+        {
+            var dialog = new BetDialog(Root.XamlRoot, Controller.Balance);
+            string? input = await dialog.AskAsync();
+            if (input is not null)
+                Controller.PlaceBet(input);
+        }
+        finally
+        {
+            _isBetDialogOpen = false;
+        }
+
+        // The dialog hands focus back to Place Bet, which is disabled once a round has started.
+        Actions.FocusFirstEnabledAction();
+    }
 
     // Window.Close, not Application.Exit: it runs the window's Closed handlers (so the lifecycle
     // work in issue #12 can hook there) and ends the app because this is its only window.

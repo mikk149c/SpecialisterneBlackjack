@@ -51,6 +51,19 @@ public sealed partial class ActionBar : UserControl
     /// </summary>
     public void ShowNotice(string notice) => _status?.ShowNotice(notice);
 
+    /// <summary>
+    /// Moves keyboard focus to the first enabled action button, in display order. After a bet that
+    /// starts a round that is Hit; after a rejected bet it is Place Bet again.
+    /// </summary>
+    public void FocusFirstEnabledAction()
+    {
+        foreach (var button in new[] { PlaceBetButton, HitButton, StandButton, DoubleDownButton, QuitButton })
+        {
+            if (button.IsEnabled && button.Focus(FocusState.Programmatic))
+                return;
+        }
+    }
+
     private static void OnControllerChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) =>
         ((ActionBar)sender).BindStatus((GameController)e.NewValue);
 
