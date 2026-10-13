@@ -2,7 +2,8 @@ Name: Mikkel Jøregensen
 Project: Blackjack
 Reqirements:
     Functionel reqirement:
-    - Console based GUI
+    - Console based GUI. A second WinUI 3 front end exists that shows the same information
+      and layout, is driven by the same game engine and reuses the ASCII art cards
     - The game shall support one player against one dealer.
     - The game shall use a standard 52-card deck.
     - The deck shall be shuffled before a new game starts.
@@ -32,6 +33,6 @@ Reqirements:
     
     Non functionel reqirement:
     - GUI independent game logic
-    - Ascii art cards for console based GUI
+    - Ascii art cards for console based GUI (reused by the WinUI front end)
 Codeing language: C#
 Estimated time:5-8 days of 8 hours
