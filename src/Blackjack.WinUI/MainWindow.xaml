@@ -67,12 +67,15 @@
                                       Cards="{x:Bind Controller.PlayerCards, Mode=OneWay}"
                                       ValueLabel="{x:Bind Controller.PlayerValueLabel, Mode=OneWay}" />
 
-                <!-- Placeholder for the action bar (rule, status line, entries row, rule: four 16 px lines
-                     plus padding), sized to what the real bar needs so the layout does not shift when
-                     it is filled in. -->
+                <!-- Fixed height (rule, status line, buttons, rule) so the DEALER section never moves. -->
                 <Grid x:Name="ActionBarHost"
-                      Height="80"
-                      AutomationProperties.Name="Actions" />
+                      Height="88"
+                      AutomationProperties.Name="Actions">
+                    <controls:ActionBar x:Name="Actions"
+                                        Controller="{x:Bind Controller}"
+                                        PlaceBetRequested="OnPlaceBetRequested"
+                                        QuitRequested="OnQuitRequested" />
+                </Grid>
 
                 <controls:HandSection x:Name="DealerHand"
                                       Title="DEALER"
