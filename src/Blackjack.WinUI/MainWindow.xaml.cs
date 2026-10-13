@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Blackjack.Presentation;
 using Blackjack.WinUI.Dialogs;
 using Microsoft.UI.Windowing;
@@ -38,7 +39,9 @@ public sealed partial class MainWindow : Window
 
     // WinUI throws if a second ContentDialog is shown while one is open, and the B key auto-repeats
     // while held, so a request that arrives while the dialog is up is dropped. The flag is reset in
-    // finally so a failed ShowAsync cannot lock betting for the rest of the session.
+    // finally so a failed ShowAsync cannot lock betting for the rest of the session. This is an
+    // async void event handler, so an exception would escape to Application.UnhandledException;
+    // it is caught here instead and shown in the status line.
     private async void OnPlaceBetRequested(object? sender, EventArgs e)
     {
         if (_isBetDialogOpen)
@@ -52,6 +55,10 @@ public sealed partial class MainWindow : Window
             if (input is not null)
                 Controller.PlaceBet(input);
         }
+        catch (Exception exception)
+        {
+            ShowError(exception);
+        }
         finally
         {
             _isBetDialogOpen = false;
@@ -59,6 +66,13 @@ public sealed partial class MainWindow : Window
 
         // The dialog hands focus back to Place Bet, which is disabled once a round has started.
         Actions.FocusFirstEnabledAction();
+    }
+
+    /// <summary>Logs an unexpected exception and tells the player in the status line that something went wrong.</summary>
+    public void ShowError(Exception exception)
+    {
+        Debug.WriteLine($"Unexpected error: {exception}");
+        Actions.ShowNotice(ErrorMessages.Unexpected(exception));
     }
 
     // Window.Close, not Application.Exit: it runs the window's Closed handlers (so the lifecycle
