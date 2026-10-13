@@ -1,4 +1,5 @@
 using Blackjack.Game;
+using Blackjack.Presentation;
 
 namespace Blackjack.Console;
 
@@ -11,62 +12,39 @@ namespace Blackjack.Console;
 internal sealed class ScreenRenderer
 {
     private const int Width = 96;
-    private const int StackLayers = 3;
-    private const int DeckWidth = CardArtGallery.CardWidth + (StackLayers - 1);
-    private const int DeckHeight = CardArtGallery.CardHeight + (StackLayers - 1);
-    private const int DeckLabelRow = CardArtGallery.CardHeight / 2;
+    private const int DeckWidth = DeckStackLayout.Width;
     private const int LeftMargin = 1;
     private const int Gap = 2;
     private const int TableX = LeftMargin + DeckWidth + Gap;
     private const int TableWidth = Width - TableX;
     private const int PlayAreaTop = 3;
 
-    private static readonly (char Key, string Label, Func<IBlackjackGame, bool> IsEnabled)[] Actions =
-    {
-        ('B', "Place Bet", game => !game.IsRoundInProgress),
-        ('H', "Hit", game => game.IsRoundInProgress),
-        ('S', "Stand", game => game.IsRoundInProgress),
-        ('D', "Double Down", game => game.IsRoundInProgress
-            && game.PlayerHand.Cards.Count == 2
-            && game.Balance >= game.CurrentBet),
-        ('Q', "Quit", _ => true),
-    };
-
     private readonly CardArtGallery _gallery;
-
-    // Tracks the previous frame's cards-remaining count so a refill (the
-    // count going up instead of down) can be flagged for one frame.
-    private int? _previousCardsRemaining;
 
     public ScreenRenderer(CardArtGallery gallery)
     {
         _gallery = gallery;
     }
 
-    public void Render(IBlackjackGame game, string status)
+    public void Render(GameController controller)
     {
         try { System.Console.Clear(); }
         catch (IOException) { }
 
-        int cardsRemaining = game.GetCardsRemaining();
-        bool justRefilled = _previousCardsRemaining is int previous && cardsRemaining > previous;
-        _previousCardsRemaining = cardsRemaining;
+        WriteHeader(controller);
 
-        WriteHeader(game);
+        WriteDeckColumn(LeftMargin, PlayAreaTop, controller.CardsRemaining, controller.JustRefilled);
 
-        WriteDeckColumn(LeftMargin, PlayAreaTop, cardsRemaining, justRefilled);
-
-        WriteHandSectionAt(TableX, PlayAreaTop, "PLAYER", game.PlayerHand.Cards, PlayerValueLabel(game));
-        WriteActionBarAt(TableX, PlayAreaTop + 9, game, status);
-        WriteHandSectionAt(TableX, PlayAreaTop + 14, "DEALER", game.DealerHand.Cards, DealerValueLabel(game));
+        WriteHandSectionAt(TableX, PlayAreaTop, "PLAYER", controller.PlayerCards, controller.PlayerValueLabel);
+        WriteActionBarAt(TableX, PlayAreaTop + 9, controller);
+        WriteHandSectionAt(TableX, PlayAreaTop + 14, "DEALER", controller.DealerCards, controller.DealerValueLabel);
 
         System.Console.SetCursorPosition(0, PlayAreaTop + 22);
     }
 
-    private static void WriteHeader(IBlackjackGame game)
+    private static void WriteHeader(GameController controller)
     {
-        string lastRound = game.LastOutcome?.ToString() ?? "-";
-        WriteAt(0, 0, PadTrunc($" Balance: {game.Balance,-8} Bet: {game.CurrentBet,-6} Last Round: {lastRound,-12}", Width));
+        WriteAt(0, 0, PadTrunc(HeaderBarText.ConsoleLine(controller.Balance, controller.CurrentBet, controller.LastRoundLabel), Width));
         WriteAt(0, 1, new string('=', Width));
     }
 
@@ -74,51 +52,18 @@ internal sealed class ScreenRenderer
     {
         ConsoleColor color = justRefilled ? ConsoleColor.Green : ConsoleColor.DarkYellow;
 
-        WriteAt(x, y, PadTrunc(Center("DECK", DeckWidth), DeckWidth), color);
+        WriteAt(x, y, PadTrunc(DeckStackLayout.TitleLine, DeckWidth), color);
 
-        var stack = BuildDeckStackLines(_gallery.GetCardBack());
+        var label = DeckStackLayout.LabelFor(cardsRemaining, justRefilled);
+        var stack = DeckStackLayout.Build(_gallery.GetCardBack(), label);
 
-        string label = justRefilled ? "REFILLED" : cardsRemaining.ToString();
-        string overlay = "|" + Center(label, CardArtGallery.CardWidth - 2) + "|";
-        stack[DeckLabelRow] = overlay + stack[DeckLabelRow][CardArtGallery.CardWidth..];
-
-        for (int row = 0; row < stack.Length; row++)
+        for (int row = 0; row < stack.Count; row++)
             WriteAt(x, y + 1 + row, PadTrunc(stack[row], DeckWidth), color);
-    }
-
-    // Layers a few offset copies of the card-back art on top of each other so
-    // the deck reads as a stack of cards rather than a single card.
-    private static string[] BuildDeckStackLines(IReadOnlyList<string> cardBack)
-    {
-        var grid = new char[DeckHeight, DeckWidth];
-        for (int r = 0; r < DeckHeight; r++)
-            for (int c = 0; c < DeckWidth; c++)
-                grid[r, c] = ' ';
-
-        for (int layer = StackLayers - 1; layer >= 0; layer--)
-        {
-            for (int r = 0; r < CardArtGallery.CardHeight; r++)
-            {
-                string line = cardBack[r];
-                for (int c = 0; c < CardArtGallery.CardWidth; c++)
-                    grid[r + layer, c + layer] = line[c];
-            }
-        }
-
-        var result = new string[DeckHeight];
-        for (int r = 0; r < DeckHeight; r++)
-        {
-            var sb = new System.Text.StringBuilder(DeckWidth);
-            for (int c = 0; c < DeckWidth; c++)
-                sb.Append(grid[r, c]);
-            result[r] = sb.ToString();
-        }
-        return result;
     }
 
     private void WriteHandSectionAt(int x, int y, string title, IReadOnlyList<Card> cards, string valueLabel)
     {
-        WriteAt(x, y, PadTrunc($" -- {title} ({valueLabel}) --", TableWidth));
+        WriteAt(x, y, PadTrunc($" {HandSectionText.Header(title, valueLabel)}", TableWidth));
 
         if (cards.Count == 0)
         {
@@ -137,18 +82,18 @@ internal sealed class ScreenRenderer
         }
     }
 
-    private static void WriteActionBarAt(int x, int y, IBlackjackGame game, string status)
+    private static void WriteActionBarAt(int x, int y, GameController controller)
     {
         WriteAt(x, y, new string('-', TableWidth));
-        WriteAt(x, y + 1, PadTrunc($" {status}", TableWidth));
+        WriteAt(x, y + 1, PadTrunc($" {controller.Status}", TableWidth));
 
         System.Console.SetCursorPosition(x, y + 2);
         System.Console.Write(' ');
         int used = 1;
-        foreach (var (key, label, isEnabled) in Actions)
+        foreach (var action in GameActions.All)
         {
-            string segment = $"[{key}] {label}  ";
-            System.Console.ForegroundColor = isEnabled(game) ? ConsoleColor.White : ConsoleColor.DarkGray;
+            string segment = $"{action.DisplayText}  ";
+            System.Console.ForegroundColor = action.IsEnabled(controller) ? ConsoleColor.White : ConsoleColor.DarkGray;
             System.Console.Write(segment);
             used += segment.Length;
         }
@@ -157,39 +102,6 @@ internal sealed class ScreenRenderer
             System.Console.Write(new string(' ', TableWidth - used));
 
         WriteAt(x, y + 3, new string('-', TableWidth));
-    }
-
-    private static string PlayerValueLabel(IBlackjackGame game) =>
-        game.PlayerHand.Cards.Count == 0 ? "-" : game.PlayerHand.Value.ToString();
-
-    private static string DealerValueLabel(IBlackjackGame game)
-    {
-        if (game.DealerHand.Cards.Count == 0)
-            return "-";
-
-        if (game.IsDealerHoleCardRevealed)
-            return game.DealerHand.Value.ToString();
-
-        int visible = game.DealerHand.Cards.Where(card => card.IsFaceUp).Sum(CardPipValue);
-        return $"{visible} + ?";
-    }
-
-    private static int CardPipValue(Card card) => card.Rank switch
-    {
-        Rank.Jack or Rank.Queen or Rank.King => 10,
-        Rank.Ace => 11,
-        _ => (int)card.Rank,
-    };
-
-    private static string Center(string text, int width)
-    {
-        if (text.Length >= width)
-            return text[..width];
-
-        int totalPad = width - text.Length;
-        int left = totalPad / 2;
-        int right = totalPad - left;
-        return new string(' ', left) + text + new string(' ', right);
     }
 
     // Pads/truncates a line to a fixed width so redrawing in place never

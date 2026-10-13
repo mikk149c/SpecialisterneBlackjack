@@ -1,0 +1,87 @@
+<Window
+    x:Class="Blackjack.WinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Blackjack.WinUI.Controls"
+    xmlns:presentation="using:Blackjack.Presentation"
+    Title="Blackjack">
+    <!-- Same arrangement as the console: header bar and rule on top, the deck on the left, and on the
+         right PLAYER, the action bar, then DEALER. Elements are declared in that order, which is also
+         the reading order and the tab order. Everything is bound to the GameController; the controller
+         raises PropertyChanged on the UI thread because its actions are only called from UI handlers. -->
+    <Grid x:Name="Root"
+          Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+          RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header bar. Its parts are Raw for screen readers; the bar itself carries one description. -->
+        <StackPanel x:Name="HeaderBar"
+                    Grid.Row="0"
+                    Margin="12,8,12,0"
+                    Orientation="Horizontal"
+                    Spacing="24"
+                    AutomationProperties.Name="{x:Bind presentation:HeaderBarText.AccessibleName(Controller.Balance, Controller.CurrentBet, Controller.LastRoundLabel), Mode=OneWay}">
+            <TextBlock AutomationProperties.AccessibilityView="Raw"
+                       FontFamily="Cascadia Mono, Consolas"
+                       FontSize="14"
+                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                       Text="{x:Bind presentation:HeaderBarText.Balance(Controller.Balance), Mode=OneWay}" />
+            <TextBlock AutomationProperties.AccessibilityView="Raw"
+                       FontFamily="Cascadia Mono, Consolas"
+                       FontSize="14"
+                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                       Text="{x:Bind presentation:HeaderBarText.Bet(Controller.CurrentBet), Mode=OneWay}" />
+            <TextBlock AutomationProperties.AccessibilityView="Raw"
+                       FontFamily="Cascadia Mono, Consolas"
+                       FontSize="14"
+                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                       Text="{x:Bind presentation:HeaderBarText.LastRound(Controller.LastRoundLabel), Mode=OneWay}" />
+        </StackPanel>
+
+        <Rectangle Grid.Row="1"
+                   Height="1"
+                   AutomationProperties.AccessibilityView="Raw"
+                   Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+        <Grid Grid.Row="2" Margin="12,0,12,12" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <controls:DeckStack x:Name="Deck"
+                                Grid.Column="0"
+                                VerticalAlignment="Top"
+                                IsTabStop="False"
+                                CardBackLines="{x:Bind CardBackLines}"
+                                CardsRemaining="{x:Bind Controller.CardsRemaining, Mode=OneWay}"
+                                JustRefilled="{x:Bind Controller.JustRefilled, Mode=OneWay}" />
+
+            <StackPanel Grid.Column="1" Spacing="12">
+                <controls:HandSection x:Name="PlayerHand"
+                                      Title="PLAYER"
+                                      Cards="{x:Bind Controller.PlayerCards, Mode=OneWay}"
+                                      ValueLabel="{x:Bind Controller.PlayerValueLabel, Mode=OneWay}" />
+
+                <!-- Fixed height (rule, status line, buttons, rule) so the DEALER section never moves. -->
+                <Grid x:Name="ActionBarHost"
+                      Height="88"
+                      AutomationProperties.Name="Actions">
+                    <controls:ActionBar x:Name="Actions"
+                                        Controller="{x:Bind Controller}"
+                                        PlaceBetRequested="OnPlaceBetRequested"
+                                        QuitRequested="OnQuitRequested" />
+                </Grid>
+
+                <controls:HandSection x:Name="DealerHand"
+                                      Title="DEALER"
+                                      Cards="{x:Bind Controller.DealerCards, Mode=OneWay}"
+                                      ValueLabel="{x:Bind Controller.DealerValueLabel, Mode=OneWay}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

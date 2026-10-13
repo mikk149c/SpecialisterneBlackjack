@@ -1,0 +1,68 @@
+<UserControl
+    x:Class="Blackjack.WinUI.Controls.ActionBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:presentation="using:Blackjack.Presentation"
+    IsTabStop="False">
+    <!-- Rule, status line, five buttons, rule: the console's action bar. Buttons are declared in
+         display order, which is also the tab order. Label, accessible name and key come from
+         GameActions; the keyboard accelerators are attached in code from the same table. Enabled
+         states bind per button to the controller's Can* properties, except Place Bet, whose state
+         comes from ActionBarStatus (it is also off when the player is out of credits). The status
+         line text comes from ActionBarStatus (controller status, out-of-credits message, optional
+         one-shot notice). The status line is a polite live region so a screen reader announces
+         each outcome message. -->
+    <StackPanel Spacing="4">
+        <Rectangle Height="1"
+                   AutomationProperties.AccessibilityView="Raw"
+                   Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+        <TextBlock x:Name="StatusText"
+                   AutomationProperties.LiveSetting="Polite"
+                   FontFamily="Cascadia Mono, Consolas"
+                   FontSize="14"
+                   Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                   IsTextScaleFactorEnabled="False"
+                   TextTrimming="CharacterEllipsis" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="PlaceBetButton"
+                    Click="OnPlaceBetClick"
+                    KeyboardAcceleratorPlacementMode="Hidden"
+                    Content="{x:Bind presentation:GameActions.PlaceBet.DisplayText}"
+                    AutomationProperties.Name="{x:Bind presentation:GameActions.PlaceBet.Label}"
+                    AutomationProperties.AcceleratorKey="{x:Bind presentation:GameActions.PlaceBet.AcceleratorKey}" />
+            <Button x:Name="HitButton"
+                    Click="OnHitClick"
+                    IsEnabled="{x:Bind Controller.CanHit, Mode=OneWay}"
+                    KeyboardAcceleratorPlacementMode="Hidden"
+                    Content="{x:Bind presentation:GameActions.Hit.DisplayText}"
+                    AutomationProperties.Name="{x:Bind presentation:GameActions.Hit.Label}"
+                    AutomationProperties.AcceleratorKey="{x:Bind presentation:GameActions.Hit.AcceleratorKey}" />
+            <Button x:Name="StandButton"
+                    Click="OnStandClick"
+                    IsEnabled="{x:Bind Controller.CanStand, Mode=OneWay}"
+                    KeyboardAcceleratorPlacementMode="Hidden"
+                    Content="{x:Bind presentation:GameActions.Stand.DisplayText}"
+                    AutomationProperties.Name="{x:Bind presentation:GameActions.Stand.Label}"
+                    AutomationProperties.AcceleratorKey="{x:Bind presentation:GameActions.Stand.AcceleratorKey}" />
+            <Button x:Name="DoubleDownButton"
+                    Click="OnDoubleDownClick"
+                    IsEnabled="{x:Bind Controller.CanDoubleDown, Mode=OneWay}"
+                    KeyboardAcceleratorPlacementMode="Hidden"
+                    Content="{x:Bind presentation:GameActions.DoubleDown.DisplayText}"
+                    AutomationProperties.Name="{x:Bind presentation:GameActions.DoubleDown.Label}"
+                    AutomationProperties.AcceleratorKey="{x:Bind presentation:GameActions.DoubleDown.AcceleratorKey}" />
+            <Button x:Name="QuitButton"
+                    Click="OnQuitClick"
+                    KeyboardAcceleratorPlacementMode="Hidden"
+                    Content="{x:Bind presentation:GameActions.Quit.DisplayText}"
+                    AutomationProperties.Name="{x:Bind presentation:GameActions.Quit.Label}"
+                    AutomationProperties.AcceleratorKey="{x:Bind presentation:GameActions.Quit.AcceleratorKey}" />
+        </StackPanel>
+
+        <Rectangle Height="1"
+                   AutomationProperties.AccessibilityView="Raw"
+                   Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+    </StackPanel>
+</UserControl>
