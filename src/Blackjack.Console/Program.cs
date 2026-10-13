@@ -53,7 +53,7 @@ static bool HandleKey(ConsoleKey key, GameController controller)
 static string? PromptForBet(int balance)
 {
     TrySetCursorVisible(true);
-    System.Console.Write($"\n Enter bet amount (balance {balance}): ");
+    System.Console.Write($"\n {BetPrompt.Message(balance)} ");
     var input = System.Console.ReadLine();
     TrySetCursorVisible(false);
     return input;
