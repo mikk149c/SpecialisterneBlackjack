@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Blackjack.Game;
 
 namespace Blackjack.Presentation;
@@ -7,9 +8,10 @@ namespace Blackjack.Presentation;
 /// Everything a front end needs to show and drive one blackjack session:
 /// display state, which actions are enabled, and the action methods. It owns
 /// the status text and the deck-refill rule so every UI behaves identically.
-/// Action methods never throw for rule violations; the reason is put in
-/// <see cref="Status"/> instead, and an action that is not currently allowed
-/// is ignored.
+/// Action methods never throw: a rule violation puts its reason in
+/// <see cref="Status"/>, an unexpected engine exception is logged and reported
+/// there as "Something went wrong", and an action that is not currently
+/// allowed is ignored.
 /// </summary>
 public sealed class GameController : INotifyPropertyChanged
 {
@@ -81,10 +83,13 @@ public sealed class GameController : INotifyPropertyChanged
             return;
         }
 
-        _game.Hit();
-        Commit(_game.IsRoundInProgress
-            ? StatusMessages.PlayerTurn
-            : StatusMessages.DescribeOutcome(_game.LastOutcome));
+        Perform(() =>
+        {
+            _game.Hit();
+            return _game.IsRoundInProgress
+                ? StatusMessages.PlayerTurn
+                : StatusMessages.DescribeOutcome(_game.LastOutcome);
+        });
     }
 
     public void Stand()
@@ -95,8 +100,11 @@ public sealed class GameController : INotifyPropertyChanged
             return;
         }
 
-        _game.Stand();
-        Commit(StatusMessages.DescribeOutcome(_game.LastOutcome));
+        Perform(() =>
+        {
+            _game.Stand();
+            return StatusMessages.DescribeOutcome(_game.LastOutcome);
+        });
     }
 
     public void DoubleDown()
@@ -107,15 +115,18 @@ public sealed class GameController : INotifyPropertyChanged
             return;
         }
 
-        try
+        Perform(() =>
         {
-            _game.DoubleDown();
-            Commit(StatusMessages.DescribeOutcome(_game.LastOutcome));
-        }
-        catch (InvalidOperationException ex)
-        {
-            Commit(ex.Message);
-        }
+            try
+            {
+                _game.DoubleDown();
+                return StatusMessages.DescribeOutcome(_game.LastOutcome);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return ex.Message;
+            }
+        });
     }
 
     public void PlaceBet(string? input)
@@ -136,19 +147,42 @@ public sealed class GameController : INotifyPropertyChanged
             return;
         }
 
-        // Topping up the deck here, before dealing, keeps a fresh deck from ever
-        // being appended behind cards that are already on the table.
-        RefillDeckIfLow();
+        Perform(() =>
+        {
+            // Topping up the deck here, before dealing, keeps a fresh deck from ever
+            // being appended behind cards that are already on the table.
+            RefillDeckIfLow();
 
+            try
+            {
+                _game.PlaceBet(amount);
+                return StatusMessages.PlayerTurn;
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException)
+            {
+                return ex.Message;
+            }
+        });
+    }
+
+    // The boundary for everything the engine does on the player's behalf. Rule violations are
+    // turned into status text by the callers; anything else is a fault the player cannot fix, so it
+    // is logged and shown as "something went wrong" instead of crashing the front end. It is not
+    // swallowed: the state is re-read and the message is visible.
+    private void Perform(Func<string> action)
+    {
+        string status;
         try
         {
-            _game.PlaceBet(amount);
-            Commit(StatusMessages.PlayerTurn);
+            status = action();
         }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException)
+        catch (Exception ex)
         {
-            Commit(ex.Message);
+            Debug.WriteLine($"Unexpected error during a game action: {ex}");
+            status = ErrorMessages.Unexpected(ex);
         }
+
+        Commit(status);
     }
 
     // A disallowed action still refreshes the state, so JustRefilled lasts

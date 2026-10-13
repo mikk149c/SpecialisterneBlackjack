@@ -12,6 +12,9 @@ public static class StatusMessages
     public const string InvalidBetAmount = "Invalid bet amount - enter a whole number.";
     public const string PlayerTurn = "Your turn: Hit, Stand, or Double Down.";
 
+    /// <summary>WinUI-only: the console has no special handling for a zero balance.</summary>
+    public const string OutOfCredits = "You are out of credits.";
+
     public static string DescribeOutcome(RoundOutcome? outcome) => outcome switch
     {
         RoundOutcome.PlayerWin => "You win! Press [B] to play again.",
