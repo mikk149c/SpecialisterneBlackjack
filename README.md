@@ -211,6 +211,11 @@ Visual Studio is needed; the .NET SDK on Windows is enough.
 dotnet run --project src/Blackjack.WinUI -r win-x64
 ```
 
+**WinUI-specific addition (not in the console app):** when the balance reaches 0 and
+no round is in progress, the status line reads "You are out of credits." and only
+Quit stays enabled. The console keeps its original behaviour and lets you try a bet
+that is then rejected.
+
 ## Status
 
 The engine (`Blackjack.Game`) implements dealing, betting, Hit/Stand/Double
